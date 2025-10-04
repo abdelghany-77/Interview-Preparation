@@ -16,6 +16,23 @@ const questions = {
       {
         q: "What is git stash?",
         a: "git stash temporarily saves your uncommitted changes (both staged and unstaged) so you can work on something else, and then restore them later using 'git stash pop' or 'git stash apply'.",
+        example: `# Save current changes
+git stash
+
+# Save with a message
+git stash save "WIP: working on feature"
+
+# List all stashes
+git stash list
+
+# Apply and remove latest stash
+git stash pop
+
+# Apply without removing
+git stash apply
+
+# Apply specific stash
+git stash apply stash@{2}`,
       },
       {
         q: "How do you clone a repository from GitHub?",
@@ -46,6 +63,18 @@ const questions = {
       {
         q: "What is the difference between merge and rebase?",
         a: "Merge combines branches and creates a new merge commit preserving history. Rebase rewrites commits on top of another branch, creating a linear history.",
+        example: `# MERGE (creates merge commit)
+git checkout main
+git merge feature-branch
+# Result: main has new merge commit
+
+# REBASE (linear history)
+git checkout feature-branch
+git rebase main
+# Result: feature commits moved on top of main
+
+# Interactive rebase to clean up commits
+git rebase -i HEAD~3`,
       },
       {
         q: "How do you revert a commit that has already been pushed to the remote repository?",
@@ -112,15 +141,19 @@ function renderQuestions() {
 
     topic.easy.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="git-easy-${index}">
+        <div class="question-card expanded" data-question-id="git-easy-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -139,15 +172,19 @@ function renderQuestions() {
 
     topic.intermediate.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="git-intermediate-${index}">
+        <div class="question-card expanded" data-question-id="git-intermediate-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -166,15 +203,19 @@ function renderQuestions() {
 
     topic.hard.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="git-hard-${index}">
+        <div class="question-card expanded" data-question-id="git-hard-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -263,11 +304,33 @@ function updateThemeIcon() {
   }
 }
 
+// Back to top functionality
+function initBackToTop() {
+  const backToTopBtn = document.getElementById("backToTop");
+  if (!backToTopBtn) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 300) {
+      backToTopBtn.classList.add("visible");
+    } else {
+      backToTopBtn.classList.remove("visible");
+    }
+  });
+
+  backToTopBtn.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
+}
+
 // Load questions on page load
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   renderQuestions();
   updateProgressBar();
+  initBackToTop();
 
   const themeToggle = document.querySelector(".theme-toggle");
   if (themeToggle) {

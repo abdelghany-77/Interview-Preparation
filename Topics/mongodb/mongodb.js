@@ -36,6 +36,18 @@ const questions = {
       {
         q: "How do you insert data?",
         a: "db.collection.insertOne() or insertMany().",
+        example: `// Insert single document
+db.users.insertOne({
+  name: "John",
+  email: "john@example.com",
+  age: 25
+});
+
+// Insert multiple documents
+db.users.insertMany([
+  { name: "Alice", email: "alice@example.com" },
+  { name: "Bob", email: "bob@example.com" }
+]);`,
       },
       {
         q: "How do you delete documents?",
@@ -72,10 +84,43 @@ const questions = {
       {
         q: "Structure of the find command?",
         a: "find({filter}, {projection}, {options}).",
+        example: `// Find all documents
+db.users.find();
+
+// Find with filter
+db.users.find({ age: { $gt: 21 } });
+
+// Find with projection (only show name and email)
+db.users.find(
+  { age: { $gt: 21 } },
+  { name: 1, email: 1, _id: 0 }
+);
+
+// With options (sort and limit)
+db.users.find({ age: { $gt: 21 } })
+  .sort({ name: 1 })
+  .limit(10);`,
       },
       {
         q: "What is aggregation and why pipeline?",
         a: "Aggregation processes documents in stages (pipeline). Each stage's output is input for the next — used for analytics and transformations.",
+        example: `db.orders.aggregate([
+  // Stage 1: Filter documents
+  { $match: { status: "completed" } },
+  
+  // Stage 2: Group by customer
+  { $group: {
+    _id: "$customerId",
+    totalSpent: { $sum: "$amount" },
+    orderCount: { $sum: 1 }
+  }},
+  
+  // Stage 3: Sort by total spent
+  { $sort: { totalSpent: -1 } },
+  
+  // Stage 4: Limit results
+  { $limit: 5 }
+]);`,
       },
       {
         q: "What does explain() do?",
@@ -260,15 +305,19 @@ function renderQuestions() {
 
     topic.easy.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="mongodb-easy-${index}">
+        <div class="question-card expanded" data-question-id="mongodb-easy-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -287,11 +336,10 @@ function renderQuestions() {
 
     topic.intermediate.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="mongodb-intermediate-${index}">
+        <div class="question-card expanded" data-question-id="mongodb-intermediate-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
@@ -314,11 +362,10 @@ function renderQuestions() {
 
     topic.hard.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="mongodb-hard-${index}">
+        <div class="question-card expanded" data-question-id="mongodb-hard-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
@@ -410,10 +457,32 @@ function updateThemeIcon() {
   }
 }
 
+// Back to top functionality
+function initBackToTop() {
+  const backToTopBtn = document.getElementById("backToTop");
+  if (!backToTopBtn) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 300) {
+      backToTopBtn.classList.add("visible");
+    } else {
+      backToTopBtn.classList.remove("visible");
+    }
+  });
+
+  backToTopBtn.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   renderQuestions();
   updateProgressBar();
+  initBackToTop();
 
   const themeToggle = document.querySelector(".theme-toggle");
   if (themeToggle) {

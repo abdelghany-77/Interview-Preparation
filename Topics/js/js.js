@@ -12,6 +12,14 @@ const questions = {
       {
         q: "Explain Hoisting.",
         a: "Hoisting is JavaScript's behavior of moving variable and function declarations to the top of their scope before code execution. Variables declared with 'var' are hoisted and initialized with undefined, while 'let' and 'const' are hoisted but remain in a Temporal Dead Zone until initialization.",
+        example: `console.log(x); // undefined (var is hoisted)
+var x = 5;
+
+console.log(y); // ReferenceError (let is in TDZ)
+let y = 10;
+
+greet(); // "Hello!" (function declarations are fully hoisted)
+function greet() { console.log("Hello!"); }`,
       },
       {
         q: "What is the difference between == and ===?",
@@ -32,6 +40,21 @@ const questions = {
       {
         q: "What is the difference between call, bind, and apply?",
         a: "All three are used to set the 'this' context. 'call' invokes the function immediately with arguments passed individually, 'apply' invokes immediately with arguments as an array, 'bind' returns a new function with 'this' bound permanently.",
+        example: `const person = { name: 'John' };
+
+function greet(greeting, punctuation) {
+  console.log(greeting + ', ' + this.name + punctuation);
+}
+
+// call - invokes immediately, args individually
+greet.call(person, 'Hello', '!'); // "Hello, John!"
+
+// apply - invokes immediately, args as array
+greet.apply(person, ['Hi', '?']); // "Hi, John?"
+
+// bind - returns new function with 'this' bound
+const boundGreet = greet.bind(person);
+boundGreet('Hey', '.'); // "Hey, John."`,
       },
       {
         q: "What are the types of scope in JS?",
@@ -68,10 +91,40 @@ const questions = {
       {
         q: "What is a Promise? Why use it? States?",
         a: "A Promise represents a value that may be available now, later, or never. It's used for asynchronous operations. Three states: Pending (initial), Fulfilled (success), Rejected (failure). Helps avoid callback hell and provides better error handling.",
+        example: `const myPromise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    const success = true;
+    if (success) {
+      resolve('Data loaded!');
+    } else {
+      reject('Error occurred');
+    }
+  }, 1000);
+});
+
+myPromise
+  .then(result => console.log(result))
+  .catch(error => console.log(error));`,
       },
       {
         q: "What is the difference between Promise and async/await?",
         a: "async/await is syntactic sugar over Promises. Promises use .then() chains, while async/await makes asynchronous code look synchronous and more readable. async functions always return a Promise, await pauses execution until Promise resolves.",
+        example: `// Using Promises
+fetchData()
+  .then(data => processData(data))
+  .then(result => console.log(result))
+  .catch(error => console.log(error));
+
+// Using async/await (cleaner syntax)
+async function getData() {
+  try {
+    const data = await fetchData();
+    const result = await processData(data);
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+}`,
       },
       {
         q: "What is the difference between slice and splice?",
@@ -300,15 +353,19 @@ function renderQuestions() {
 
     topic.easy.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="js-easy-${index}">
+        <div class="question-card expanded" data-question-id="js-easy-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -327,11 +384,10 @@ function renderQuestions() {
 
     topic.intermediate.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="js-intermediate-${index}">
+        <div class="question-card expanded" data-question-id="js-intermediate-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
@@ -354,11 +410,10 @@ function renderQuestions() {
 
     topic.hard.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="js-hard-${index}">
+        <div class="question-card expanded" data-question-id="js-hard-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
@@ -413,8 +468,30 @@ function initTheme() {
   }
 }
 
+// Back to top functionality
+function initBackToTop() {
+  const backToTopBtn = document.getElementById("backToTop");
+  if (!backToTopBtn) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 300) {
+      backToTopBtn.classList.add("visible");
+    } else {
+      backToTopBtn.classList.remove("visible");
+    }
+  });
+
+  backToTopBtn.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
+}
+
 // Load questions on page load
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   renderQuestions();
+  initBackToTop();
 });

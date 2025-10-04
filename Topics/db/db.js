@@ -4,6 +4,16 @@ const questions = {
       {
         q: "What is the difference between a primary key and a foreign key?",
         a: "A primary key uniquely identifies each record in a table. A foreign key is a field (or collection of fields) in one table that refers to the primary key in another table. It's used to establish a relationship between two tables.",
+        example: `CREATE TABLE Users (
+  user_id INT PRIMARY KEY,
+  name VARCHAR(100)
+);
+
+CREATE TABLE Orders (
+  order_id INT PRIMARY KEY,
+  user_id INT,
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);`,
       },
       {
         q: "Can you explain what normalization is and why it is important?",
@@ -12,6 +22,14 @@ const questions = {
       {
         q: "What is the difference between DELETE, TRUNCATE, and DROP?",
         a: "DELETE: removes rows (can be filtered), can be rolled back. TRUNCATE: removes all rows, cannot be rolled back. DROP: removes the entire table from the DB.",
+        example: `-- DELETE (removes specific rows, can be rolled back)
+DELETE FROM Users WHERE age < 18;
+
+-- TRUNCATE (removes all rows, cannot be rolled back)
+TRUNCATE TABLE Users;
+
+-- DROP (removes entire table structure)
+DROP TABLE Users;`,
       },
       {
         q: "What is a database?",
@@ -40,6 +58,17 @@ const questions = {
       {
         q: "What is CRUD?",
         a: "CRUD stands for Create, Read, Update, and Delete - the four basic operations that can be performed on database data.",
+        example: `-- CREATE
+INSERT INTO Users (name, email) VALUES ('John', 'john@example.com');
+
+-- READ
+SELECT * FROM Users WHERE name = 'John';
+
+-- UPDATE
+UPDATE Users SET email = 'newemail@example.com' WHERE name = 'John';
+
+-- DELETE
+DELETE FROM Users WHERE name = 'John';`,
       },
     ],
     intermediate: [
@@ -66,6 +95,17 @@ const questions = {
       {
         q: "What are common SQL queries?",
         a: "SELECT: retrieves data from tables. INSERT: adds new records. UPDATE: modifies existing records. DELETE: removes records. JOIN: combines data from multiple tables. WHERE: filters results. GROUP BY: groups rows. ORDER BY: sorts results.",
+        example: `-- SELECT with WHERE and ORDER BY
+SELECT name, email FROM Users WHERE age > 18 ORDER BY name;
+
+-- INSERT
+INSERT INTO Users (name, email) VALUES ('John', 'john@email.com');
+
+-- UPDATE
+UPDATE Users SET email = 'new@email.com' WHERE user_id = 1;
+
+-- DELETE
+DELETE FROM Users WHERE user_id = 1;`,
       },
       {
         q: "What are common NoSQL queries (MongoDB example)?",
@@ -74,6 +114,15 @@ const questions = {
       {
         q: "What is a JOIN in SQL?",
         a: "JOIN combines rows from two or more tables based on a related column. Types: INNER JOIN (matching records), LEFT JOIN (all from left + matches), RIGHT JOIN (all from right + matches), FULL JOIN (all records).",
+        example: `-- INNER JOIN
+SELECT Users.name, Orders.order_date
+FROM Users
+INNER JOIN Orders ON Users.user_id = Orders.user_id;
+
+-- LEFT JOIN
+SELECT Users.name, Orders.order_date
+FROM Users
+LEFT JOIN Orders ON Users.user_id = Orders.user_id;`,
       },
       {
         q: "What is a transaction?",
@@ -160,15 +209,19 @@ function renderQuestions() {
 
     topic.easy.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="db-easy-${index}">
+        <div class="question-card expanded" data-question-id="db-easy-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -187,15 +240,19 @@ function renderQuestions() {
 
     topic.intermediate.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="db-intermediate-${index}">
+        <div class="question-card expanded" data-question-id="db-intermediate-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -214,15 +271,19 @@ function renderQuestions() {
 
     topic.hard.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="db-hard-${index}">
+        <div class="question-card expanded" data-question-id="db-hard-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -312,10 +373,32 @@ function updateThemeIcon() {
   }
 }
 
+// Back to top functionality
+function initBackToTop() {
+  const backToTopBtn = document.getElementById("backToTop");
+  if (!backToTopBtn) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 300) {
+      backToTopBtn.classList.add("visible");
+    } else {
+      backToTopBtn.classList.remove("visible");
+    }
+  });
+
+  backToTopBtn.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   renderQuestions();
   updateProgressBar();
+  initBackToTop();
 
   const themeToggle = document.querySelector(".theme-toggle");
   if (themeToggle) {

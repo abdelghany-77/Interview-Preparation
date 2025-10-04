@@ -16,10 +16,41 @@ const questions = {
       {
         q: "What is middleware in Express?",
         a: "Middleware functions are functions with access to req, res, and next. They can execute code, modify requests/responses, end the cycle, or pass control using next().",
+        example: `// Logging middleware
+app.use((req, res, next) => {
+  console.log('Time:', Date.now());
+  next(); // Pass control to next middleware
+});
+
+// Authentication middleware
+const authMiddleware = (req, res, next) => {
+  if (req.headers.authorization) {
+    next();
+  } else {
+    res.status(401).send('Unauthorized');
+  }
+};
+
+app.get('/protected', authMiddleware, (req, res) => {
+  res.send('Protected data');
+});`,
       },
       {
         q: "How is error handling done in Express?",
         a: "By defining error-handling middleware (4 parameters: err, req, res, next) after all routes. It catches and handles any thrown or unhandled errors.",
+        example: `// Routes
+app.get('/error', (req, res) => {
+  throw new Error('Something went wrong!');
+});
+
+// Error-handling middleware (must have 4 params)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: err.message,
+    status: 'error'
+  });
+});`,
       },
       {
         q: "What is CORS and how is it controlled in Express?",
@@ -60,6 +91,22 @@ const questions = {
       {
         q: "Explain JWT.",
         a: "JWT (JSON Web Token) is a compact, signed token used for authentication. It consists of Header, Payload, and Signature, and allows servers to verify user identity without storing session data.",
+        example: `const jwt = require('jsonwebtoken');
+
+// Create token
+const token = jwt.sign(
+  { userId: 123, email: 'user@example.com' },
+  'secret_key',
+  { expiresIn: '1h' }
+);
+
+// Verify token
+try {
+  const decoded = jwt.verify(token, 'secret_key');
+  console.log(decoded); // { userId: 123, email: '...', iat: ..., exp: ... }
+} catch (err) {
+  console.log('Invalid token');
+}`,
       },
       {
         q: "What is NPM?",
@@ -184,15 +231,19 @@ function renderQuestions() {
 
     topic.easy.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="nodejs-easy-${index}">
+        <div class="question-card expanded" data-question-id="nodejs-easy-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
             <div class="answer-text">${item.a}</div>
+            ${
+              item.example
+                ? `<div class="example-section"><div class="example-label">💡 Example:</div><pre class="example-code">${item.example}</pre></div>`
+                : ""
+            }
           </div>
         </div>
       `;
@@ -211,11 +262,10 @@ function renderQuestions() {
 
     topic.intermediate.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="nodejs-intermediate-${index}">
+        <div class="question-card expanded" data-question-id="nodejs-intermediate-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
@@ -238,11 +288,10 @@ function renderQuestions() {
 
     topic.hard.forEach((item, index) => {
       html += `
-        <div class="question-card" onclick="toggleAnswer(this)" data-question-id="nodejs-hard-${index}">
+        <div class="question-card expanded" data-question-id="nodejs-hard-${index}">
           <div class="question-header">
             <span class="question-number">${index + 1}</span>
             <span class="question-text">${item.q}</span>
-            <span class="toggle-icon">▼</span>
           </div>
           <div class="answer-section">
             <span class="answer-label">Answer</span>
@@ -334,10 +383,32 @@ function updateThemeIcon() {
   }
 }
 
+// Back to top functionality
+function initBackToTop() {
+  const backToTopBtn = document.getElementById("backToTop");
+  if (!backToTopBtn) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 300) {
+      backToTopBtn.classList.add("visible");
+    } else {
+      backToTopBtn.classList.remove("visible");
+    }
+  });
+
+  backToTopBtn.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   renderQuestions();
   updateProgressBar();
+  initBackToTop();
 
   const themeToggle = document.querySelector(".theme-toggle");
   if (themeToggle) {
