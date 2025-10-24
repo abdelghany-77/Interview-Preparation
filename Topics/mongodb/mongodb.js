@@ -163,6 +163,58 @@ db.users.find({ age: { $gt: 21 } })
       {
         q: "Difference between embedded documents and references?",
         a: "Embedded: store data directly inside a document (better for reads). References: store links (IDs) to other documents (better for modular design).",
+        example: `// EMBEDDED DOCUMENTS (Denormalized)
+// Good for: One-to-few relationships, data frequently accessed together
+db.users.insertOne({
+  name: "John",
+  email: "john@example.com",
+  address: {
+    street: "123 Main St",
+    city: "New York",
+    zip: "10001"
+  },
+  orders: [
+    { orderId: 1, product: "Laptop", price: 1200 },
+    { orderId: 2, product: "Mouse", price: 25 }
+  ]
+});
+
+// Single query to get all data
+db.users.findOne({ name: "John" }); // Gets user + address + orders
+
+// REFERENCES (Normalized)
+// Good for: One-to-many or many-to-many, data updated frequently
+db.users.insertOne({
+  _id: ObjectId("123"),
+  name: "John",
+  email: "john@example.com"
+});
+
+db.orders.insertMany([
+  { userId: ObjectId("123"), product: "Laptop", price: 1200 },
+  { userId: ObjectId("123"), product: "Mouse", price: 25 }
+]);
+
+// Requires multiple queries or $lookup (join)
+const user = db.users.findOne({ _id: ObjectId("123") });
+const orders = db.orders.find({ userId: ObjectId("123") }).toArray();
+
+// Or use aggregation $lookup
+db.users.aggregate([
+  { $match: { _id: ObjectId("123") } },
+  {
+    $lookup: {
+      from: "orders",
+      localField: "_id",
+      foreignField: "userId",
+      as: "orders"
+    }
+  }
+]);
+
+// When to use each:
+// Embedded: Blog post with comments (few comments per post)
+// References: Social media posts with likes (millions of likes)`,
       },
       {
         q: "What are virtual properties in Mongoose?",
@@ -221,6 +273,51 @@ db.users.find({ age: { $gt: 21 } })
       {
         q: "What is sharding, and why is key selection crucial?",
         a: "Sharding splits data across multiple servers for scalability. Choosing the right shard key avoids uneven data distribution and bottlenecks.",
+        example: `// SHARDING: Horizontal partitioning of data across multiple servers
+
+// Enable sharding on database
+sh.enableSharding("mydb");
+
+// Choose shard key (VERY IMPORTANT!)
+// BAD shard key: incrementing ID (all writes go to one shard)
+sh.shardCollection("mydb.users", { _id: 1 }); // ❌ Poor choice
+
+// GOOD shard key: high cardinality, even distribution
+sh.shardCollection("mydb.users", { email: "hashed" }); // ✅ Better
+sh.shardCollection("mydb.orders", { customerId: 1, orderDate: 1 }); // ✅ Compound
+
+// Example data distribution:
+// Shard 1: emails starting with a-h
+// Shard 2: emails starting with i-p
+// Shard 3: emails starting with q-z
+
+// Shard key requirements:
+// 1. High cardinality (many unique values)
+// 2. Even distribution (no hotspots)
+// 3. Query isolation (queries target specific shards)
+
+// Bad shard keys:
+// - Monotonically increasing (_id, timestamp) → all writes to one shard
+// - Low cardinality (country, status) → uneven distribution
+// - Frequently updated fields → migration overhead
+
+// Good shard keys:
+// - Hashed _id
+// - User ID in multi-tenant app
+// - Combination of user + timestamp
+
+// Query with shard key (targeted - fast)
+db.users.find({ email: "john@example.com" });
+// Only queries one shard
+
+// Query without shard key (broadcast - slow)
+db.users.find({ name: "John" });
+// Queries ALL shards (scatter-gather)
+
+// Sharding architecture:
+// Config servers: Store metadata
+// Mongos routers: Route queries to correct shard
+// Shards: Store actual data`,
       },
       {
         q: "Difference between horizontal and vertical scaling?",

@@ -75,10 +75,80 @@ DELETE FROM Users WHERE name = 'John';`,
       {
         q: "What are ACID properties in a database system?",
         a: "ACID stands for Atomicity, Consistency, Isolation, and Durability. Atomicity: Ensures that all operations within a transaction are completed successfully; otherwise, the transaction is aborted. Consistency: Ensures that a transaction can only bring the database from one valid state to another. Isolation: Ensures that concurrent transactions result in a system state as if transactions were executed serially. Durability: Ensures that once a transaction has been committed, it will remain so, even in the event of a system failure.",
+        example: `-- ATOMICITY: All or nothing
+START TRANSACTION;
+UPDATE accounts SET balance = balance - 100 WHERE user_id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE user_id = 2;
+-- If either fails, both rollback
+COMMIT; -- Or ROLLBACK if error
+
+-- CONSISTENCY: Rules always enforced
+CREATE TABLE accounts (
+  balance DECIMAL(10,2) CHECK (balance >= 0) -- Can't go negative
+);
+
+-- ISOLATION: Transactions don't interfere
+-- Transaction 1:
+START TRANSACTION;
+SELECT balance FROM accounts WHERE user_id = 1; -- Reads 1000
+UPDATE accounts SET balance = 900 WHERE user_id = 1;
+-- Transaction 2 won't see this until committed
+COMMIT;
+
+-- DURABILITY: Changes persist after commit
+START TRANSACTION;
+INSERT INTO users VALUES (1, 'John');
+COMMIT; -- Data survives even if server crashes after this
+
+-- Isolation levels (from weakest to strongest):
+-- READ UNCOMMITTED: Can read uncommitted data (dirty reads)
+-- READ COMMITTED: Only committed data visible (prevents dirty reads)
+-- REPEATABLE READ: Same read gives same result (prevents non-repeatable reads)
+-- SERIALIZABLE: Full isolation (prevents phantom reads)
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;`,
       },
       {
         q: "What is an index? What are the pros and cons?",
         a: "An index is a data structure (like a lookup table) that improves the speed of data retrieval operations on a database table. Pros: Faster SELECT queries. Cons: Slower INSERT/UPDATE/DELETE because every change must also update the index, which adds overhead.",
+        example: `-- Create index on frequently queried column
+CREATE INDEX idx_email ON users(email);
+
+-- Query uses index (fast lookup)
+SELECT * FROM users WHERE email = 'john@example.com';
+-- Without index: O(n) table scan
+-- With index: O(log n) B-tree lookup
+
+-- Composite index (multiple columns)
+CREATE INDEX idx_name_age ON users(last_name, first_name);
+
+-- Query benefits from composite index
+SELECT * FROM users WHERE last_name = 'Smith' AND first_name = 'John';
+
+-- Unique index (enforces uniqueness)
+CREATE UNIQUE INDEX idx_username ON users(username);
+
+-- View existing indexes
+SHOW INDEXES FROM users;
+
+-- Drop index
+DROP INDEX idx_email ON users;
+
+-- Performance comparison:
+-- Without index:
+-- SELECT * FROM users WHERE email = 'test@example.com';
+-- Rows examined: 1,000,000 (full table scan)
+-- Time: 2.5s
+
+-- With index:
+-- CREATE INDEX idx_email ON users(email);
+-- SELECT * FROM users WHERE email = 'test@example.com';
+-- Rows examined: 1 (index lookup)
+-- Time: 0.001s
+
+-- Cost: Every INSERT/UPDATE/DELETE must update index
+INSERT INTO users (name, email) VALUES ('John', 'john@example.com');
+-- Updates both table AND index (slower)`,
       },
       {
         q: "Can indexes slow down performance?",
@@ -87,6 +157,50 @@ DELETE FROM Users WHERE name = 'John';`,
       {
         q: "What is the difference between a clustered and a non-clustered index?",
         a: "Clustered index sorts data physically; only one per table. Non-clustered stores pointers to actual rows; multiple allowed.",
+        example: `-- CLUSTERED INDEX:
+-- Physical order of data matches index order
+-- Only ONE per table (usually on primary key)
+-- Faster for range queries
+
+CREATE TABLE users (
+  id INT PRIMARY KEY, -- Automatically creates clustered index
+  name VARCHAR(100),
+  email VARCHAR(100)
+);
+
+-- Data stored physically in order of id:
+-- Row 1: id=1, name='Alice'
+-- Row 2: id=2, name='Bob'
+-- Row 3: id=3, name='Charlie'
+
+SELECT * FROM users WHERE id BETWEEN 10 AND 20;
+-- Fast: Data is physically contiguous
+
+-- NON-CLUSTERED INDEX:
+-- Separate structure with pointers to actual rows
+-- Can have MULTIPLE per table
+-- Index stores: [indexed_value -> row_pointer]
+
+CREATE INDEX idx_email ON users(email);
+
+-- Index structure (simplified):
+-- 'alice@example.com' -> pointer to row with id=1
+-- 'bob@example.com' -> pointer to row with id=2
+
+SELECT * FROM users WHERE email = 'alice@example.com';
+-- 1. Lookup in index (find pointer)
+-- 2. Follow pointer to actual row
+-- Slightly slower than clustered for single lookups
+
+-- COMPOSITE INDEX:
+CREATE INDEX idx_name_age ON users(name, age);
+-- Efficient for: WHERE name = 'John' AND age = 25
+-- Less efficient for: WHERE age = 25 (doesn't use index)
+
+-- Covering index (includes all needed columns)
+CREATE INDEX idx_covering ON users(email) INCLUDE (name, age);
+SELECT name, age FROM users WHERE email = 'test@example.com';
+-- All data in index - no need to access table!`,
       },
       {
         q: "Difference between relational and non-relational databases?",

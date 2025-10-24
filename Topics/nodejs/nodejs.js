@@ -123,6 +123,245 @@ try {
     ],
     intermediate: [
       {
+        q: "What are streams in Node.js?",
+        a: "Streams are objects that enable reading/writing data in chunks rather than all at once. Types: Readable (read data), Writable (write data), Duplex (read & write), Transform (modify data while reading/writing). Efficient for large files and real-time data.",
+        example: `const fs = require('fs');
+
+// Readable stream - reading file in chunks
+const readStream = fs.createReadStream('largefile.txt', {
+  encoding: 'utf8',
+  highWaterMark: 1024 // chunk size in bytes
+});
+
+readStream.on('data', (chunk) => {
+  console.log('Received chunk:', chunk.length, 'bytes');
+});
+
+readStream.on('end', () => {
+  console.log('Finished reading');
+});
+
+// Writable stream
+const writeStream = fs.createWriteStream('output.txt');
+writeStream.write('Hello ');
+writeStream.write('World');
+writeStream.end();
+
+// Piping - connect readable to writable
+const input = fs.createReadStream('input.txt');
+const output = fs.createWriteStream('output.txt');
+input.pipe(output);
+
+// Transform stream - modify data
+const { Transform } = require('stream');
+const uppercase = new Transform({
+  transform(chunk, encoding, callback) {
+    this.push(chunk.toString().toUpperCase());
+    callback();
+  }
+});
+
+process.stdin.pipe(uppercase).pipe(process.stdout);`,
+      },
+      {
+        q: "What is back pressure in streams?",
+        a: "Back pressure is a mechanism that prevents overwhelming the consumer when the producer sends data faster than it can be processed. Streams automatically handle this by pausing the readable stream when the writable stream's buffer is full.",
+        example: `const fs = require('fs');
+
+// Without back pressure handling (BAD - may cause memory issues)
+const readable = fs.createReadStream('huge-file.txt');
+const writable = fs.createWriteStream('output.txt');
+
+readable.on('data', (chunk) => {
+  writable.write(chunk); // May cause buffer overflow
+});
+
+// With back pressure handling (GOOD)
+readable.on('data', (chunk) => {
+  const canContinue = writable.write(chunk);
+  if (!canContinue) {
+    // Buffer is full, pause reading
+    readable.pause();
+  }
+});
+
+writable.on('drain', () => {
+  // Buffer is drained, resume reading
+  readable.resume();
+});
+
+// Using pipe (handles back pressure automatically)
+readable.pipe(writable); // Best practice!`,
+      },
+      {
+        q: "What is the difference between stateless and stateful in Node.js?",
+        a: "Stateless: Each request is independent, no session data stored on server (uses tokens like JWT). Scalable and easier to load balance. Stateful: Server stores session data (in memory or database). Requires sticky sessions for load balancing.",
+        example: `// Stateless approach (REST API with JWT)
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const app = express();
+
+// Login - create token
+app.post('/login', (req, res) => {
+  const user = { id: 1, email: 'user@example.com' };
+  const token = jwt.sign(user, 'secret', { expiresIn: '1h' });
+  res.json({ token });
+});
+
+// Protected route - verify token
+app.get('/profile', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  try {
+    const user = jwt.verify(token, 'secret');
+    res.json({ user });
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// Stateful approach (using express-session)
+const session = require('express-session');
+
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+app.post('/login', (req, res) => {
+  req.session.userId = 1;
+  res.send('Logged in');
+});
+
+app.get('/profile', (req, res) => {
+  if (req.session.userId) {
+    res.json({ userId: req.session.userId });
+  } else {
+    res.status(401).send('Not logged in');
+  }
+});`,
+      },
+      {
+        q: "What are sticky sessions and when are they needed?",
+        a: "Sticky sessions (session affinity) ensure all requests from a user go to the same server instance. Needed for stateful applications where session data is stored in server memory. Not needed for stateless apps using JWT/tokens.",
+        example: `// Load balancer configuration (Nginx example)
+// With sticky sessions
+upstream backend {
+  ip_hash; // Routes same IP to same server
+  server server1.example.com;
+  server server2.example.com;
+  server server3.example.com;
+}
+
+// Better approach: Use Redis for shared sessions (no sticky sessions needed)
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
+const redis = require('redis');
+
+const redisClient = redis.createClient({
+  host: 'localhost',
+  port: 6379
+});
+
+app.use(session({
+  store: new RedisStore({ client: redisClient }),
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
+}));
+
+// Now any server can access the session data from Redis`,
+      },
+      {
+        q: "What is the Event Emitter in Node.js?",
+        a: "EventEmitter is a class that enables objects to emit named events and register listeners. Core to Node.js's event-driven architecture. Used extensively in Node.js core modules.",
+        example: `const EventEmitter = require('events');
+
+// Create custom event emitter
+class MyEmitter extends EventEmitter {}
+const myEmitter = new MyEmitter();
+
+// Register listeners
+myEmitter.on('event', (data) => {
+  console.log('Event occurred:', data);
+});
+
+// One-time listener
+myEmitter.once('connect', () => {
+  console.log('Connected!');
+});
+
+// Emit events
+myEmitter.emit('event', { message: 'Hello' });
+myEmitter.emit('connect');
+myEmitter.emit('connect'); // Won't trigger (once)
+
+// Real-world example - HTTP Server
+const http = require('http');
+const server = http.createServer();
+
+server.on('request', (req, res) => {
+  res.end('Hello');
+});
+
+server.on('connection', (socket) => {
+  console.log('New connection');
+});
+
+server.listen(3000);`,
+      },
+      {
+        q: "What is async/await and how is it better than callbacks?",
+        a: "async/await is syntactic sugar over Promises that makes asynchronous code look synchronous and more readable. It avoids callback hell, provides better error handling with try/catch, and makes code flow clearer.",
+        example: `// Callback hell (bad)
+fs.readFile('file1.txt', (err, data1) => {
+  if (err) return console.error(err);
+  fs.readFile('file2.txt', (err, data2) => {
+    if (err) return console.error(err);
+    fs.readFile('file3.txt', (err, data3) => {
+      if (err) return console.error(err);
+      console.log(data1 + data2 + data3);
+    });
+  });
+});
+
+// Promises (better)
+const fs = require('fs/promises');
+
+fs.readFile('file1.txt')
+  .then(data1 => fs.readFile('file2.txt'))
+  .then(data2 => fs.readFile('file3.txt'))
+  .then(data3 => console.log(data1 + data2 + data3))
+  .catch(err => console.error(err));
+
+// async/await (best)
+async function readFiles() {
+  try {
+    const data1 = await fs.readFile('file1.txt');
+    const data2 = await fs.readFile('file2.txt');
+    const data3 = await fs.readFile('file3.txt');
+    console.log(data1 + data2 + data3);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Parallel execution
+async function readParallel() {
+  try {
+    const [data1, data2, data3] = await Promise.all([
+      fs.readFile('file1.txt'),
+      fs.readFile('file2.txt'),
+      fs.readFile('file3.txt')
+    ]);
+    console.log(data1 + data2 + data3);
+  } catch (err) {
+    console.error(err);
+  }
+}`,
+      },
+      {
         q: "Explain the event loop. How does Node.js handle async operations?",
         a: "The event loop continuously checks for pending callbacks, I/O operations, or timers and executes them asynchronously. Node offloads I/O tasks to libuv's thread pool, freeing the main thread to handle more requests.",
       },
@@ -167,6 +406,43 @@ try {
       {
         q: "What is the difference between fork and spawn?",
         a: "fork(): Creates a new Node.js process with its own event loop and memory (used for running multiple instances of a Node app). spawn(): Launches a new process to run an external command or script (used for system-level tasks).",
+        example: `const { fork, spawn } = require('child_process');
+
+// fork() - for Node.js files
+const child = fork('child.js');
+
+// Send message to child
+child.send({ task: 'processData', data: [1, 2, 3] });
+
+// Receive message from child
+child.on('message', (msg) => {
+  console.log('Result from child:', msg);
+});
+
+// child.js
+process.on('message', (msg) => {
+  const result = msg.data.reduce((a, b) => a + b, 0);
+  process.send({ result });
+});
+
+// spawn() - for system commands
+const ls = spawn('ls', ['-lh', '/usr']);
+
+ls.stdout.on('data', (data) => {
+  console.log(\`Output: \${data}\`);
+});
+
+ls.stderr.on('data', (data) => {
+  console.error(\`Error: \${data}\`);
+});
+
+ls.on('close', (code) => {
+  console.log(\`Process exited with code \${code}\`);
+});
+
+// spawn() for long-running processes
+const python = spawn('python', ['script.py']);
+python.stdout.pipe(process.stdout); // Stream output`,
       },
       {
         q: "What are Node bindings and libuv?",
@@ -183,6 +459,46 @@ try {
       {
         q: "Explain the cluster module.",
         a: "The cluster module allows you to create multiple worker processes that share the same server port, utilizing multiple CPU cores for better scalability.",
+        example: `const cluster = require('cluster');
+const http = require('http');
+const os = require('os');
+const numCPUs = os.cpus().length;
+
+if (cluster.isMaster) {
+  console.log(\`Master \${process.pid} is running\`);
+  
+  // Fork workers for each CPU
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+  
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(\`Worker \${worker.process.pid} died\`);
+    // Restart worker
+    cluster.fork();
+  });
+  
+  // Communication with workers
+  Object.values(cluster.workers).forEach(worker => {
+    worker.send({ msg: 'Hello from master' });
+  });
+  
+} else {
+  // Workers share the same TCP connection
+  http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end(\`Handled by worker \${process.pid}\`);
+  }).listen(8000);
+  
+  console.log(\`Worker \${process.pid} started\`);
+  
+  process.on('message', (msg) => {
+    console.log('Message from master:', msg);
+  });
+}
+
+// Advanced: Load balancing with PM2 (process manager)
+// pm2 start app.js -i max  // Uses all CPUs`,
       },
       {
         q: "What are child processes in Node.js?",
@@ -191,14 +507,160 @@ try {
       {
         q: "What is process.nextTick()?",
         a: "A method that defers execution of a callback until the next iteration of the event loop, before any I/O events.",
+        example: `// Event loop phases: timers → I/O callbacks → poll → check → close
+// nextTick executes BEFORE all phases
+
+console.log('1');
+
+setTimeout(() => console.log('2 - setTimeout'), 0);
+setImmediate(() => console.log('3 - setImmediate'));
+
+process.nextTick(() => console.log('4 - nextTick'));
+
+Promise.resolve().then(() => console.log('5 - Promise'));
+
+console.log('6');
+
+// Output: 1, 6, 4, 5, 2, 3
+// nextTick > Promises > timers > setImmediate
+
+// Use case: Ensure async execution after current operation
+function asyncFunction(callback) {
+  process.nextTick(callback); // Ensures callback is async
+}
+
+asyncFunction(() => {
+  console.log('This runs asynchronously');
+});
+
+// Warning: Can cause I/O starvation if overused
+// Bad: Recursive nextTick blocks event loop
+function recursiveNextTick() {
+  process.nextTick(recursiveNextTick); // BLOCKS EVENT LOOP!
+}`,
       },
       {
         q: "Explain memory leaks in Node.js.",
         a: "Memory that is allocated but not released — caused by unclosed listeners, large caches, or global variables — leading to performance degradation.",
+        example: `// Common memory leak causes:
+
+// 1. Unclosed event listeners
+const EventEmitter = require('events');
+const emitter = new EventEmitter();
+
+function badFunction() {
+  emitter.on('event', () => {
+    // Listener never removed - LEAK!
+  });
+}
+for (let i = 0; i < 10000; i++) badFunction(); // 10k listeners!
+
+// Fix: Remove listeners
+function goodFunction() {
+  const handler = () => console.log('handled');
+  emitter.on('event', handler);
+  // Clean up
+  emitter.removeListener('event', handler);
+}
+
+// 2. Global variables and closures
+let cache = []; // Global array
+function addToCache(data) {
+  cache.push(data); // Never cleared - LEAK!
+}
+
+// Fix: Use LRU cache with size limit
+const LRU = require('lru-cache');
+const cache = new LRU({ max: 500 });
+
+// 3. Timers not cleared
+function leakyTimer() {
+  setInterval(() => {
+    console.log('Running...');
+  }, 1000); // Never cleared - LEAK!
+}
+
+// Fix: Clear timers
+const timer = setInterval(() => {}, 1000);
+clearInterval(timer);
+
+// Detect memory leaks:
+// 1. Monitor with process.memoryUsage()
+setInterval(() => {
+  const used = process.memoryUsage();
+  console.log('Memory:', Math.round(used.heapUsed / 1024 / 1024), 'MB');
+}, 5000);
+
+// 2. Use --inspect and Chrome DevTools
+// node --inspect app.js
+// 3. Use clinic.js or memwatch-next`,
       },
       {
         q: "How to improve performance in Node.js?",
         a: "Use caching (Redis), clustering, async I/O, efficient queries, compression middleware, and proper error handling.",
+        example: `const express = require('express');
+const redis = require('redis');
+const compression = require('compression');
+const cluster = require('cluster');
+const app = express();
+
+// 1. Enable gzip compression
+app.use(compression());
+
+// 2. Use caching with Redis
+const redisClient = redis.createClient();
+
+app.get('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const cacheKey = \`user:\${id}\`;
+  
+  // Check cache first
+  const cached = await redisClient.get(cacheKey);
+  if (cached) {
+    return res.json(JSON.parse(cached));
+  }
+  
+  // If not cached, fetch from DB
+  const user = await db.findUser(id);
+  
+  // Cache for 1 hour
+  await redisClient.setEx(cacheKey, 3600, JSON.stringify(user));
+  res.json(user);
+});
+
+// 3. Use clustering (multi-core)
+if (cluster.isMaster) {
+  const numCPUs = require('os').cpus().length;
+  for (let i = 0; i < numCPUs; i++) cluster.fork();
+} else {
+  app.listen(3000);
+}
+
+// 4. Database optimization
+// Use indexes, limit fields, pagination
+const users = await db.users.find(
+  { status: 'active' },
+  { projection: { name: 1, email: 1 } } // Only needed fields
+).limit(50);
+
+// 5. Use Promise.all for parallel operations
+const [users, posts, comments] = await Promise.all([
+  db.users.find(),
+  db.posts.find(),
+  db.comments.find()
+]);
+
+// 6. Stream large responses
+app.get('/large-file', (req, res) => {
+  const stream = fs.createReadStream('large-file.json');
+  stream.pipe(res);
+});
+
+// 7. Use connection pooling
+const { MongoClient } = require('mongodb');
+const client = new MongoClient(uri, { 
+  maxPoolSize: 50 
+});`,
       },
       {
         q: "Explain microservices in Node.js.",

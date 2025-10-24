@@ -157,12 +157,420 @@ async function getData() {
     ],
     intermediate: [
       {
+        q: "What are let and const in ES6?",
+        a: "In ES6, `let` and `const` declare block-scoped variables. `let` creates mutable variables that can be reassigned, while `const` creates read-only references that cannot be reassigned. Both are scoped to the nearest block (e.g., if statements), unlike var which is function-scoped.",
+        example: `// Block scoping
+if (true) {
+  let x = 10;
+  const y = 20;
+  var z = 30;
+}
+console.log(z); // 30
+console.log(x); // ReferenceError: x is not defined
+
+// const with objects - reference is immutable, not content
+const person = { name: 'John' };
+person.name = 'Jane'; // ✓ Allowed
+person = {}; // ✗ TypeError: Assignment to constant variable`,
+      },
+      {
+        q: "What are arrow functions in ES6?",
+        a: "Arrow functions provide concise syntax for function expressions using `=>`. They omit `function` and `return` keywords for single expressions, and do not bind their own `this` (lexical binding). Parentheses can be skipped for single parameters, and braces for multi-line bodies.",
+        example: `// Traditional function
+const sum1 = function(a, b) {
+  return a + b;
+};
+
+// Arrow function - concise
+const sum2 = (a, b) => a + b;
+
+// Single parameter - no parentheses needed
+const double = x => x * 2;
+
+// No parameters - empty parentheses required
+const greet = () => console.log('Hello!');
+
+// Lexical 'this' binding
+function Timer() {
+  this.seconds = 0;
+  
+  // Arrow function inherits 'this' from Timer
+  setInterval(() => {
+    this.seconds++;
+  }, 1000);
+}`,
+      },
+      {
+        q: "What are template literals in ES6?",
+        a: "Template literals use backticks (`` ` ``) for multi-line strings and embedded expressions via `${expression}`. Tagged template literals prefix a function before the template for custom processing (e.g., CSS-in-JS).",
+        example: `// Multi-line strings
+const message = \`Hello,
+this is a
+multi-line string\`;
+
+// Expression interpolation
+const name = 'John';
+const age = 30;
+const greeting = \`My name is \${name} and I'm \${age} years old\`;
+
+// Expression evaluation
+const price = 19.99;
+const tax = 0.1;
+const total = \`Total: $\${(price * (1 + tax)).toFixed(2)}\`;
+
+// Tagged templates
+function highlight(strings, ...values) {
+  return strings.reduce((acc, str, i) => 
+    \`\${acc}\${str}<strong>\${values[i] || ''}</strong>\`, '');
+}
+const name = 'Alice';
+const result = highlight\`Hello \${name}!\`;`,
+      },
+      {
+        q: "What is destructuring in ES6?",
+        a: "Destructuring extracts values from arrays/objects into variables. Used in declarations, assignments, parameters, and for-of loops. For objects: `{prop}`; for arrays: `[val]`.",
+        example: `// Object destructuring
+const person = { name: 'John', age: 30, city: 'NYC' };
+const { name, age } = person;
+
+// With renaming
+const { name: fullName, age: years } = person;
+
+// With default values
+const { name, country = 'USA' } = person;
+
+// Array destructuring
+const colors = ['red', 'green', 'blue'];
+const [first, second] = colors;
+
+// Skip elements
+const [, , third] = colors;
+
+// Rest operator
+const [primary, ...others] = colors;
+
+// Nested destructuring
+const user = {
+  id: 1,
+  profile: { name: 'Alice', email: 'alice@example.com' }
+};
+const { profile: { name, email } } = user;
+
+// Function parameters
+function displayUser({ name, age }) {
+  console.log(\`\${name} is \${age} years old\`);
+}`,
+      },
+      {
+        q: "What are default parameters in ES6?",
+        a: "Functions can have default values for parameters if undefined is passed, avoiding manual checks.",
+        example: `// Without default parameters (ES5)
+function greet(name) {
+  name = name || 'Guest';
+  return 'Hello ' + name;
+}
+
+// With default parameters (ES6)
+function greet(name = 'Guest') {
+  return \`Hello \${name}\`;
+}
+
+// Default with expressions
+function createUser(name, role = 'user', id = Date.now()) {
+  return { name, role, id };
+}
+
+// Using previous parameters
+function calculatePrice(price, tax = price * 0.1) {
+  return price + tax;
+}`,
+      },
+      {
+        q: "What is the rest parameter in ES6?",
+        a: "Rest parameters (`...args`) collect indefinite arguments into an array as the last parameter, replacing `arguments` object.",
+        example: `// Rest parameters
+function sum(...numbers) {
+  return numbers.reduce((acc, num) => acc + num, 0);
+}
+console.log(sum(1, 2, 3, 4)); // 10
+
+// With regular parameters
+function multiply(multiplier, ...numbers) {
+  return numbers.map(num => num * multiplier);
+}
+console.log(multiply(2, 1, 2, 3)); // [2, 4, 6]
+
+// Difference from arguments object
+function oldWay() {
+  const args = Array.from(arguments); // Convert to array
+  return args.reduce((a, b) => a + b);
+}
+
+function newWay(...args) {
+  return args.reduce((a, b) => a + b); // Already an array
+}`,
+      },
+      {
+        q: "What is the spread operator in ES6?",
+        a: "Spread (`...`) expands iterables (arrays/objects/strings) into arguments or elements. Opposite of rest.",
+        example: `// Array spreading
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2]; // [1, 2, 3, 4, 5, 6]
+
+// Copy arrays
+const original = [1, 2, 3];
+const copy = [...original];
+
+// Object spreading
+const person = { name: 'John', age: 30 };
+const employee = { ...person, role: 'Developer', age: 31 };
+// { name: 'John', age: 31, role: 'Developer' }
+
+// Function arguments
+const numbers = [1, 2, 3];
+console.log(Math.max(...numbers)); // 3
+
+// String spreading
+const str = 'Hello';
+const chars = [...str]; // ['H', 'e', 'l', 'l', 'o']`,
+      },
+      {
+        q: "What are enhanced object literals in ES6?",
+        a: "ES6 enhances object literals with property shorthand (e.g., `a` instead of `a: a`), method shorthand (e.g., `sum(a, b) { ... }` without `function`), and computed property names using `[expression]`.",
+        example: `const name = 'Alice';
+const age = 25;
+
+// ES5
+const person1 = {
+  name: name,
+  age: age,
+  greet: function() {
+    return 'Hello';
+  }
+};
+
+// ES6 - Property shorthand
+const person2 = {
+  name,
+  age,
+  greet() {  // Method shorthand
+    return 'Hello';
+  }
+};
+
+// Computed property names
+const prop = 'firstName';
+const user = {
+  [prop]: 'John',
+  ['last' + 'Name']: 'Doe',
+  [\`age_\${Date.now()}\`]: 30
+};`,
+      },
+      {
+        q: "What is Set in ES6?",
+        a: "Set stores unique values of any type. Methods: `add`, `has`, `size`, `delete`.",
+        example: `// Creating a Set
+const numbers = new Set([1, 2, 3, 3, 4]);
+console.log(numbers); // Set(4) {1, 2, 3, 4}
+
+// Add values
+numbers.add(5);
+numbers.add(3); // Ignored - already exists
+
+// Check existence
+console.log(numbers.has(3)); // true
+
+// Size
+console.log(numbers.size); // 5
+
+// Delete
+numbers.delete(2);
+
+// Iterate
+for (const num of numbers) {
+  console.log(num);
+}
+
+// Remove duplicates from array
+const arr = [1, 2, 2, 3, 3, 4];
+const unique = [...new Set(arr)]; // [1, 2, 3, 4]`,
+      },
+      {
+        q: "What is Map in ES6?",
+        a: "Map stores key-value pairs with any type as keys (including objects/primitives), maintains insertion order. Methods: `set`, `get`, `has`, `size`.",
+        example: `// Creating a Map
+const map = new Map();
+
+// Set values
+map.set('name', 'John');
+map.set('age', 30);
+map.set(1, 'number key');
+
+// Objects as keys
+const keyObj = { id: 1 };
+map.set(keyObj, 'object value');
+
+// Get values
+console.log(map.get('name')); // 'John'
+console.log(map.get(keyObj)); // 'object value'
+
+// Check existence
+console.log(map.has('age')); // true
+
+// Size
+console.log(map.size); // 4
+
+// Iterate
+for (const [key, value] of map) {
+  console.log(\`\${key}: \${value}\`);
+}
+
+// Convert to array
+const entries = [...map]; // [[key, value], ...]`,
+      },
+      {
+        q: "What are Symbols in ES6?",
+        a: "Symbols are unique primitives for unique identifiers (e.g., object properties, constants). Created via `Symbol(description)`. Global registry via `Symbol.for`. Equality false unless from registry.",
+        example: `// Create unique symbols
+const sym1 = Symbol('description');
+const sym2 = Symbol('description');
+console.log(sym1 === sym2); // false (always unique)
+
+// Use as object keys
+const id = Symbol('id');
+const user = {
+  name: 'John',
+  [id]: 123
+};
+console.log(user[id]); // 123
+
+// Hidden from normal iteration
+console.log(Object.keys(user)); // ['name']
+console.log(Object.getOwnPropertySymbols(user)); // [Symbol(id)]
+
+// Global symbol registry
+const globalSym1 = Symbol.for('app.id');
+const globalSym2 = Symbol.for('app.id');
+console.log(globalSym1 === globalSym2); // true
+
+// Well-known symbols
+const obj = {
+  [Symbol.iterator]() {
+    // Custom iterator
+  }
+};`,
+      },
+      {
+        q: "What are Promises in ES6?",
+        a: "Promises represent async operation outcomes (pending/fulfilled/rejected). Chain with `then`/`catch`/`finally`. Settled means fulfilled or rejected.",
+        example: `// Creating a Promise
+const promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    const success = Math.random() > 0.5;
+    if (success) {
+      resolve('Operation successful!');
+    } else {
+      reject('Operation failed!');
+    }
+  }, 1000);
+});
+
+// Consuming promises
+promise
+  .then(result => console.log(result))
+  .catch(error => console.error(error))
+  .finally(() => console.log('Done'));
+
+// Promise.all - wait for all
+Promise.all([promise1, promise2, promise3])
+  .then(results => console.log(results));
+
+// Promise.race - first to finish
+Promise.race([promise1, promise2])
+  .then(result => console.log(result));
+
+// Promise.allSettled - wait for all, get all results
+Promise.allSettled([promise1, promise2])
+  .then(results => console.log(results));
+// [{status: 'fulfilled', value: ...}, {status: 'rejected', reason: ...}]`,
+      },
+      {
+        q: "What are classes in ES6?",
+        a: "Classes are syntactic sugar over prototype-based inheritance. They support constructors, getters/setters, inheritance via `extends`, and methods. Defined via class declarations or expressions. They do not introduce a new OOP model but simplify constructor functions.",
+        example: `// Class declaration
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  
+  // Method
+  greet() {
+    return \`Hello, I'm \${this.name}\`;
+  }
+  
+  // Getter
+  get info() {
+    return \`\${this.name}, \${this.age}\`;
+  }
+  
+  // Setter
+  set age(value) {
+    if (value < 0) throw new Error('Invalid age');
+    this._age = value;
+  }
+  
+  // Static method
+  static species() {
+    return 'Homo sapiens';
+  }
+}
+
+// Inheritance
+class Employee extends Person {
+  constructor(name, age, role) {
+    super(name, age); // Call parent constructor
+    this.role = role;
+  }
+  
+  greet() {
+    return \`\${super.greet()}, I'm a \${this.role}\`;
+  }
+}
+
+const emp = new Employee('John', 30, 'Developer');`,
+      },
+      {
         q: "What is a function in JS?",
-        a: "A function is a reusable block of code designed to perform a specific task. Functions are first-class objects in JavaScript, meaning they can be assigned to variables, passed as arguments, returned from other functions, and have properties and methods.",
+        a: "A function is a reusable block of code designed to perform a specific task. Functions are first-class objects, meaning they can be assigned to variables, passed as arguments, returned from other functions, and have properties and methods.",
       },
       {
         q: "What is a prototype?",
         a: "A prototype is an object from which other objects inherit properties and methods. Every JavaScript object has an internal link to another object called its prototype. When accessing a property, JavaScript first looks at the object itself, then its prototype chain.",
+        example: `// Every function has a prototype property
+function Person(name) {
+  this.name = name;
+}
+
+Person.prototype.greet = function() {
+  return \`Hello, I'm \${this.name}\`;
+};
+
+const john = new Person('John');
+console.log(john.greet()); // "Hello, I'm John"
+console.log(john.__proto__ === Person.prototype); // true
+
+// Prototype chain
+console.log(john.__proto__); // Person.prototype
+console.log(john.__proto__.__proto__); // Object.prototype
+console.log(john.__proto__.__proto__.__proto__); // null
+
+// Adding methods to built-in prototypes (not recommended)
+Array.prototype.last = function() {
+  return this[this.length - 1];
+};
+[1, 2, 3].last(); // 3`,
       },
       {
         q: "What is the difference between __proto__, [[Prototype]], Object.getPrototypeOf() and Object.setPrototypeOf()?",
@@ -175,6 +583,29 @@ async function getData() {
       {
         q: "What is the event loop?",
         a: "The event loop is JavaScript's mechanism for handling asynchronous operations. It continuously checks the call stack and task queues. When the call stack is empty, it takes the first task from the queue and pushes it to the call stack for execution.",
+        example: `console.log('1');
+
+setTimeout(() => {
+  console.log('2'); // Macrotask - goes to macrotask queue
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('3'); // Microtask - goes to microtask queue
+});
+
+console.log('4');
+
+// Output: 1, 4, 3, 2
+// Execution order:
+// 1. Synchronous code: console.log('1'), console.log('4')
+// 2. Microtask queue: Promise callback (3)
+// 3. Macrotask queue: setTimeout callback (2)
+
+// Event loop phases:
+// 1. Call Stack → Execute sync code
+// 2. Microtask Queue → Process all microtasks
+// 3. Macrotask Queue → Process one macrotask
+// 4. Repeat`,
       },
       {
         q: "What is the difference between coercion and casting?",
@@ -194,7 +625,46 @@ async function getData() {
       },
       {
         q: "Explain closure.",
-        a: "A closure is a function that has access to variables in its outer (enclosing) lexical scope, even after the outer function has returned. Closures allow data privacy and factory patterns. Example: function outer() { let count = 0; return function() { count++; } }",
+        a: "A closure is a function that has access to variables in its outer (enclosing) lexical scope, even after the outer function has returned. Closures allow data privacy and factory patterns.",
+        example: `// Basic closure
+function outer() {
+  let count = 0;
+  return function inner() {
+    count++;
+    console.log(count);
+  };
+}
+
+const counter = outer();
+counter(); // 1
+counter(); // 2
+counter(); // 3
+
+// Data privacy with closures
+function createBankAccount(initialBalance) {
+  let balance = initialBalance; // Private variable
+  
+  return {
+    deposit(amount) {
+      balance += amount;
+      return balance;
+    },
+    withdraw(amount) {
+      if (amount > balance) return 'Insufficient funds';
+      balance -= amount;
+      return balance;
+    },
+    getBalance() {
+      return balance;
+    }
+  };
+}
+
+const account = createBankAccount(100);
+account.deposit(50); // 150
+account.withdraw(30); // 120
+console.log(account.balance); // undefined (private!)
+console.log(account.getBalance()); // 120`,
       },
       {
         q: "What is prototypal inheritance? How does it differ from classical inheritance?",
@@ -276,7 +746,270 @@ async function getData() {
     hard: [
       {
         q: "What is currying in JS?",
-        a: "Currying is a technique of transforming a function with multiple arguments into a sequence of functions, each taking a single argument. Example: function curry(a) { return function(b) { return function(c) { return a + b + c; }}}; curry(1)(2)(3) returns 6. Useful for partial application.",
+        a: "Currying is a technique of transforming a function with multiple arguments into a sequence of functions, each taking a single argument. Useful for partial application and creating specialized functions.",
+        example: `// Basic currying
+const add = a => b => c => a + b + c;
+console.log(add(1)(2)(3)); // 6
+
+// Practical example - partial application
+const multiply = a => b => a * b;
+const double = multiply(2);
+const triple = multiply(3);
+console.log(double(5)); // 10
+console.log(triple(5)); // 15
+
+// Generic curry function
+function curry(fn) {
+  return function curried(...args) {
+    if (args.length >= fn.length) {
+      return fn.apply(this, args);
+    }
+    return function(...nextArgs) {
+      return curried.apply(this, args.concat(nextArgs));
+    };
+  };
+}
+
+function sum(a, b, c) {
+  return a + b + c;
+}
+
+const curriedSum = curry(sum);
+console.log(curriedSum(1)(2)(3)); // 6
+console.log(curriedSum(1, 2)(3)); // 6
+console.log(curriedSum(1)(2, 3)); // 6`,
+      },
+      {
+        q: "What is debouncing?",
+        a: "Debouncing limits the rate at which a function is executed. The function is only called after a certain amount of time has passed since the last invocation. Useful for search inputs, resize events, etc.",
+        example: `// Debounce implementation
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
+// Usage - search input
+const searchAPI = (query) => {
+  console.log('Searching for:', query);
+  // API call here
+};
+
+const debouncedSearch = debounce(searchAPI, 300);
+
+// User types: "h", "he", "hel", "hello"
+// API is only called once after 300ms of no typing
+input.addEventListener('input', (e) => {
+  debouncedSearch(e.target.value);
+});
+
+// Window resize example
+const handleResize = debounce(() => {
+  console.log('Window resized!');
+}, 500);
+
+window.addEventListener('resize', handleResize);`,
+      },
+      {
+        q: "What is throttling?",
+        a: "Throttling ensures a function is called at most once in a specified time period, regardless of how many times the event is triggered. Useful for scroll events, mouse movements, etc.",
+        example: `// Throttle implementation
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+// Usage - scroll event
+const handleScroll = () => {
+  console.log('Scroll position:', window.scrollY);
+};
+
+const throttledScroll = throttle(handleScroll, 1000);
+
+// Function is called max once per second, even if user scrolls continuously
+window.addEventListener('scroll', throttledScroll);
+
+// Mouse move example
+const trackMouse = throttle((e) => {
+  console.log('Mouse at:', e.clientX, e.clientY);
+}, 100);
+
+document.addEventListener('mousemove', trackMouse);
+
+// Difference: Debounce waits for quiet period, Throttle guarantees regular execution`,
+      },
+      {
+        q: "What is event bubbling and capturing?",
+        a: "Event bubbling is when an event propagates from the target element up through its ancestors to the root. Event capturing (trickling) is the opposite - from root down to target. By default, events bubble.",
+        example: `// HTML: <div id="outer"><div id="inner"><button>Click</button></div></div>
+
+// Event Bubbling (default)
+document.querySelector('#outer').addEventListener('click', () => {
+  console.log('Outer clicked');
+});
+
+document.querySelector('#inner').addEventListener('click', () => {
+  console.log('Inner clicked');
+});
+
+document.querySelector('button').addEventListener('click', () => {
+  console.log('Button clicked');
+});
+
+// Clicking button outputs: Button clicked → Inner clicked → Outer clicked
+
+// Event Capturing (set third parameter to true)
+document.querySelector('#outer').addEventListener('click', () => {
+  console.log('Outer captured');
+}, true);
+
+// Event Delegation - efficient event handling
+document.querySelector('#parent').addEventListener('click', (e) => {
+  if (e.target.matches('.delete-btn')) {
+    // Handle delete for any child element with this class
+    e.target.closest('li').remove();
+  }
+});
+
+// Stop propagation
+button.addEventListener('click', (e) => {
+  e.stopPropagation(); // Prevents bubbling
+  console.log('Only button handler runs');
+});`,
+      },
+      {
+        q: "What is CORS?",
+        a: "CORS (Cross-Origin Resource Sharing) is a security mechanism that allows or restricts web pages from making requests to a different domain than the one serving the page. Browsers block cross-origin requests by default for security.",
+        example: `// CORS headers (server-side)
+// Server needs to send these headers:
+// Access-Control-Allow-Origin: * or specific domain
+// Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+// Access-Control-Allow-Headers: Content-Type
+
+// Client-side request (browser automatically handles CORS)
+fetch('https://api.example.com/data', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ data: 'value' })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('CORS error:', error));
+
+// CORS preflight request (for complex requests)
+// Browser sends OPTIONS request first to check if actual request is allowed
+
+// Workarounds (development only):
+// 1. CORS proxy
+// 2. JSONP (old technique)
+// 3. Server-side proxy
+// 4. Browser extensions (disable CORS - NOT for production)`,
+      },
+      {
+        q: "What is the difference between deep clone and shallow clone?",
+        a: "Shallow clone copies only the first level of properties. Nested objects are copied by reference. Deep clone recursively copies all levels, creating completely independent copies.",
+        example: `const original = {
+  name: 'John',
+  address: { city: 'NYC', zip: '10001' }
+};
+
+// Shallow clone methods
+const shallow1 = { ...original };
+const shallow2 = Object.assign({}, original);
+const shallow3 = Array.from(original); // for arrays
+
+shallow1.name = 'Jane'; // OK - primitive changed
+shallow1.address.city = 'LA'; // Problem! Original also changed
+
+console.log(original.address.city); // 'LA' - mutated!
+
+// Deep clone methods
+
+// 1. JSON (limitations: no functions, undefined, symbols, dates)
+const deep1 = JSON.parse(JSON.stringify(original));
+
+// 2. Custom recursive function
+function deepClone(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (obj instanceof Date) return new Date(obj);
+  if (obj instanceof Array) return obj.map(item => deepClone(item));
+  
+  const cloned = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      cloned[key] = deepClone(obj[key]);
+    }
+  }
+  return cloned;
+}
+
+// 3. structuredClone (modern browsers)
+const deep2 = structuredClone(original);
+
+deep2.address.city = 'LA';
+console.log(original.address.city); // 'NYC' - not mutated!`,
+      },
+      {
+        q: "What is MVC, MVP, MVVM?",
+        a: "These are architectural patterns for organizing code. MVC (Model-View-Controller): User interacts with View, Controller updates Model, Model updates View. MVP (Model-View-Presenter): View is passive, Presenter handles all logic. MVVM (Model-View-ViewModel): ViewModel binds View and Model with two-way data binding.",
+        example: `// MVC Pattern
+class Model {
+  constructor() {
+    this.data = [];
+  }
+  
+  addItem(item) {
+    this.data.push(item);
+  }
+}
+
+class View {
+  render(data) {
+    // Update DOM with data
+    document.getElementById('list').innerHTML = 
+      data.map(item => \`<li>\${item}</li>\`).join('');
+  }
+}
+
+class Controller {
+  constructor(model, view) {
+    this.model = model;
+    this.view = view;
+  }
+  
+  addItem(item) {
+    this.model.addItem(item);
+    this.view.render(this.model.data);
+  }
+}
+
+// Usage
+const app = new Controller(new Model(), new View());
+app.addItem('Task 1');
+
+// MVVM Pattern (like Vue.js, Angular)
+// ViewModel provides two-way data binding
+class ViewModel {
+  constructor() {
+    this.data = reactive({ items: [] });
+    this.addItem = (item) => {
+      this.data.items.push(item);
+      // View automatically updates due to reactivity
+    };
+  }
+}`,
       },
       {
         q: "What is Temporal Dead Zone?",
