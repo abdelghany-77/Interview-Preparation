@@ -110,11 +110,50 @@ try {
       },
       {
         q: "What is NPM?",
-        a: "Node Package Manager, used to install, manage, and publish packages for Node.js.",
+        a: "NPM (Node Package Manager) is the default package manager for Node.js. It uses package.json to track dependencies, versions, scripts, and metadata. Common commands include npm install, npm update, and npm uninstall.",
+      },
+      {
+        q: "How does Node.js work?",
+        a: "Node.js works on a single-threaded, event-driven architecture using the V8 JavaScript engine. V8 compiles JavaScript into machine code. The Event Loop handles async tasks without blocking. Libuv provides a thread pool for background tasks like file system operations. This enables processing thousands of concurrent requests efficiently.",
+      },
+      {
+        q: "What is V8 engine in Node.js?",
+        a: "V8 is Google's open-source JavaScript engine written in C++. It compiles JavaScript to native machine code (not interpreting), manages memory and garbage collection, and provides the runtime for executing JavaScript outside browsers.",
+      },
+      {
+        q: "What is REPL in Node.js?",
+        a: "REPL stands for Read, Evaluate, Print, Loop. It's an interactive shell for testing JavaScript code. It reads input, evaluates it, prints the result, and loops back for more input - useful for quick debugging.",
+      },
+      {
+        q: "What is control flow in Node.js?",
+        a: "Control flow refers to the order in which asynchronous operations are executed and how results are handled. Since Node.js is non-blocking, tasks don't always finish in order, so control flow patterns ensure proper management.",
+      },
+      {
+        q: "What is package.json in Node.js?",
+        a: "package.json is a metadata file containing project info: dependencies, scripts, version, author, and configuration. It's essential for managing packages and defining project settings.",
+        example: `{
+  "name": "my-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}`,
       },
       {
         q: "How to manage environment variables?",
         a: "Use the dotenv package: create .env, then load with require('dotenv').config() to access variables via process.env.",
+        example: `// Install: npm install dotenv
+// .env file
+PORT=3000
+DB_URL=mongodb://localhost/mydb
+
+// app.js
+require('dotenv').config();
+const port = process.env.PORT || 3000;
+console.log(process.env.DB_URL);`,
       },
       {
         q: "What are modules in Node.js?",
@@ -388,6 +427,88 @@ async function readParallel() {
       {
         q: "Blocking vs Non-blocking functions.",
         a: "Blocking: Waits until task completes (e.g., fs.readFileSync). Non-blocking: Executes asynchronously with callbacks or Promises (fs.readFile).",
+      },
+      {
+        q: "What is event-driven programming in Node.js?",
+        a: "Event-driven programming is used to synchronize the occurrence of multiple events and make programs simple. Basic components are: callback functions (event handlers) called when events trigger, and an event loop that listens for event triggers and calls corresponding handlers.",
+      },
+      {
+        q: "What is a buffer in Node.js?",
+        a: "The Buffer class performs operations on raw binary data. Buffers deal with binary data and cannot be resized. Each integer in a buffer represents a byte. Used for handling TCP streams, file system operations, and other I/O operations.",
+      },
+      {
+        q: "Explain the crypto module in Node.js",
+        a: "The crypto module is used for encrypting, decrypting, or hashing data. It helps secure data and add authentication. Main use is converting plain text to encrypted format and decrypting when needed.",
+      },
+      {
+        q: "What is callback hell?",
+        a: "Callback hell is an issue caused by nested callbacks. It makes code look like a pyramid and difficult to read. Overcome by using promises or async/await.",
+        example: `// Callback hell example
+getData(function(a) {
+  getMoreData(a, function(b) {
+    getEvenMore(b, function(c) {
+      getEvenMoreData(c, function(d) {
+        // deeply nested...
+      });
+    });
+  });
+});`,
+      },
+      {
+        q: "Explain the use of the timers module in Node.js",
+        a: "The Timers module contains functions to execute code after a set period. It's global, no need to require it. Methods include setTimeout() (executes once after delay), setImmediate() (executes after current event loop), and setInterval() (executes repeatedly).",
+      },
+      {
+        q: "Difference between setImmediate() and process.nextTick()",
+        a: "setImmediate(): Executes callback after current event loop cycle, after I/O tasks. process.nextTick(): Executes callback immediately after current operation, before I/O or timers. nextTick can cause stack overflow if used excessively.",
+      },
+      {
+        q: "What are the different types of HTTP requests?",
+        a: "GET: Retrieve data. POST: Create new resource. PUT: Update entire resource. PATCH: Partially update resource. DELETE: Remove resource.",
+      },
+      {
+        q: "What is the difference between spawn() and fork()?",
+        a: "spawn(): Launches a new process with a given command, used for external commands. fork(): Specifically for spawning Node.js processes, has built-in IPC (inter-process communication) support for message passing between parent and child.",
+      },
+      {
+        q: "Explain the use of the passport module in Node.js",
+        a: "The passport module adds authentication features to websites/apps. It implements various authentication strategies (local, OAuth, JWT) for sign-in operations.",
+      },
+      {
+        q: "What is a fork in Node.js?",
+        a: "Fork is a method to create child processes, helping handle increasing workload. It creates a new instance of the engine, enabling multiple processes to run code simultaneously.",
+      },
+      {
+        q: "What are the three methods to avoid callback hell?",
+        a: "Using async/await, Using promises, Using generators.",
+      },
+      {
+        q: "What is body-parser in Node.js?",
+        a: "Body-parser is Node.js body-parsing middleware. It parses incoming request bodies before handling them. It's an NPM module that processes data sent in HTTP requests.",
+      },
+      {
+        q: "What is CORS in Node.js?",
+        a: "CORS (Cross-Origin Resource Sharing) is an HTTP-header based mechanism that allows servers to indicate which origins can access resources. The cors package in npm is used to handle CORS errors in Node.js applications.",
+      },
+      {
+        q: "Explain the tls module in Node.js",
+        a: "The tls module provides implementation of Transport Layer Security (TLS) and Secure Socket Layer (SSL) protocols built on OpenSSL. It helps establish secure network connections.",
+      },
+      {
+        q: "Can you access DOM in Node?",
+        a: "No, you cannot access DOM in Node.js. DOM is a client-side concept for browsers to interact with HTML/XML documents. Node.js is server-side and doesn't have browser context.",
+      },
+      {
+        q: "How do you manage packages in your Node.js project?",
+        a: "Package management is handled through npm (Node Package Manager). It allows installing/managing third-party packages and creating/publishing your own packages using package.json.",
+      },
+      {
+        q: "What is the purpose of NODE_ENV?",
+        a: "NODE_ENV environment variable specifies the environment (development, testing, production). It helps customize application behavior based on environment, enabling different configurations and optimizations.",
+      },
+      {
+        q: "What is a test pyramid in Node.js?",
+        a: "Test Pyramid is a testing strategy with three levels: Unit Tests (base - test individual functions, fast and numerous), Integration Tests (middle - test component interactions), End-to-End Tests (top - test entire app flow, slow and fewer).",
       },
       {
         q: "Difference between module.exports and exports.",
@@ -666,6 +787,102 @@ const client = new MongoClient(uri, {
         q: "Explain microservices in Node.js.",
         a: "Microservices are small, independent services that communicate via APIs. Node.js is ideal for building lightweight microservices using frameworks like Express or Fastify.",
       },
+      {
+        q: "What is piping in Node.js?",
+        a: "Piping refers to passing the output of one stream directly into another stream. It allows data to flow through multiple streams without storing in memory or writing to disk temporarily. Common in file handling, HTTP requests, and I/O operations.",
+        example: `const fs = require('fs');
+const zlib = require('zlib');
+
+// Read file -> Compress -> Write
+fs.createReadStream('input.txt')
+  .pipe(zlib.createGzip())
+  .pipe(fs.createWriteStream('input.txt.gz'));
+
+// HTTP response piping
+const http = require('http');
+http.createServer((req, res) => {
+  fs.createReadStream('large-file.txt').pipe(res);
+}).listen(3000);`,
+      },
+      {
+        q: "What is a cluster in Node.js?",
+        a: "Due to single-threaded nature, cluster modules help handle workload efficiently and take advantage of multi-core systems. They create child processes that run simultaneously with a single parent process, sharing the same server port.",
+      },
+      {
+        q: "Explain some cluster methods in Node.js",
+        a: "fork(): Creates new child process from master. isWorker: Returns true if current process is worker. isMaster: Returns true if current process is master. process: Returns the child process (global). send(): Sends message from worker to master or vice versa. kill(): Kills the current worker.",
+      },
+      {
+        q: "How to manage sessions in Node.js?",
+        a: "Session management can be done using express-session module. It helps save data in key-value form. Session data is not saved in cookie itself, just the session ID.",
+      },
+      {
+        q: "How many types of API functions are there in Node.js?",
+        a: "Two types: Asynchronous non-blocking functions (mostly I/O operations forked out of main loop), and Synchronous blocking functions (operations running in main loop).",
+      },
+      {
+        q: "How can we implement authentication and authorization in Node.js?",
+        a: "Authentication verifies user identity, Authorization determines what user can access. Implemented using packages like Passport (for OAuth, Google, GitHub strategies) and JWT (jsonwebtoken) for token-based auth and role-based authorization.",
+      },
+      {
+        q: "Explain packages used for file uploading in Node.js",
+        a: "Multer is the most popular package for file uploading. It's Node.js middleware for handling multipart/form-data, used for uploading files to the server.",
+      },
+      {
+        q: "Explain difference between Node.js and server-side languages like Python",
+        a: "Node.js is a runtime environment for JavaScript with non-blocking event-driven I/O, highly performant for I/O-heavy tasks. Python is a programming language with thread-based concurrency, more suitable for CPU-heavy operations. Node.js uses single-threaded event loop, Python uses multi-threading.",
+      },
+      {
+        q: "How to connect Node.js to a MongoDB database?",
+        a: "Connect using Mongoose package after installation.",
+        example: `const mongoose = require("mongoose");
+
+mongoose.connect("mongodb://localhost/mydb", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch(err => {
+  console.error('Connection error:', err);
+});`,
+      },
+      {
+        q: "How to read command line arguments in Node.js?",
+        a: "Use process.argv global object to read command-line arguments.",
+        example: `// index.js
+let arguments = process.argv;
+console.log(arguments);
+
+// Run: node index.js arg1 arg2
+// Output: ['node', '/path/to/index.js', 'arg1', 'arg2']
+
+// Access specific arguments
+const arg1 = process.argv[2]; // First custom argument`,
+      },
+      {
+        q: "Explain the Node.js Redis module",
+        a: "Redis is an open-source store for data structures used as database, cache, and message broker. It stores strings, hashes, sets, sorted sets, bitmaps, indexes, and streams. Redis reduces cache size making applications more efficient. Easy to integrate with Node.js applications.",
+      },
+      {
+        q: "What is web socket?",
+        a: "Web Socket is a protocol providing full-duplex (multiway) communication allowing simultaneous communication in both directions. It maintains continuous connection between user's browser (client) and server where both can send messages at any point.",
+      },
+      {
+        q: "Explain the util module in Node.js",
+        a: "Util module provides various utility functions. Includes OS Module (operating system utilities), Path Module (file path transformations), DNS Module (name resolution and DNS lookup), Net Module (creating clients and servers for asynchronous network wrapper).",
+      },
+      {
+        q: "Explain DNS module in Node.js",
+        a: "DNS module performs name resolution provided by the operating system and actual DNS lookup. Its advantage is no need to memorize IP addresses - DNS servers convert domain/subdomain names to IP addresses.",
+      },
+      {
+        q: "What is the difference between setImmediate() and setTimeout()?",
+        a: "setImmediate(): Executes callback immediately after current event loop phase, no delay. setTimeout(): Executes callback after specified delay (minimum 1ms), adds to timer queue. setImmediate runs in check phase, setTimeout in timers phase.",
+      },
+      {
+        q: "What is an Event Emitter in Node.js?",
+        a: "Event Emitter is a class allowing objects to emit events and register listeners (callbacks) to handle those events. Part of events module, commonly used for asynchronous events implementing observer pattern where emitter triggers events and listeners respond.",
+      },
     ],
   },
 };
@@ -797,7 +1014,7 @@ function updateProgress(questionId) {
 function updateProgressBar() {
   const progressData = getProgress();
   const totalAnswered = progressData.nodejs ? progressData.nodejs.length : 0;
-  const totalQuestions = 38;
+  const totalQuestions = 68;
   const percentage = Math.round((totalAnswered / totalQuestions) * 100);
 
   const progressFill = document.querySelector(".progress-fill");
