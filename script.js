@@ -20,7 +20,10 @@ function updateThemeIcon() {
   const themeToggle = document.querySelector(".theme-toggle");
   if (themeToggle) {
     const isDark = document.body.classList.contains("dark-mode");
-    themeToggle.textContent = isDark ? "☀️" : "🌙";
+    const icon = themeToggle.querySelector("i");
+    if (icon) {
+      icon.className = isDark ? "fas fa-sun" : "fas fa-moon";
+    }
   }
 }
 
@@ -65,24 +68,42 @@ function updateProgressBar() {
 }
 
 // ============================================
-// SEARCH FUNCTIONALITY
+// SEARCH FUNCTIONALITY (Debounced for performance)
 // ============================================
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 function filterTopics(searchTerm) {
   const topicCards = document.querySelectorAll(".topic-card");
   const term = searchTerm.toLowerCase();
 
-  topicCards.forEach((card) => {
-    const title = card.querySelector("h3").textContent.toLowerCase();
-    const description = card.querySelector("p").textContent.toLowerCase();
+  // Use requestAnimationFrame for smooth rendering
+  requestAnimationFrame(() => {
+    topicCards.forEach((card) => {
+      const title = card.querySelector("h3").textContent.toLowerCase();
+      const description = card.querySelector("p").textContent.toLowerCase();
 
-    if (title.includes(term) || description.includes(term)) {
-      card.style.display = "block";
-      card.style.animation = "fadeInUp 0.5s ease";
-    } else {
-      card.style.display = "none";
-    }
+      if (title.includes(term) || description.includes(term)) {
+        card.style.display = "block";
+        card.style.animation = "fadeInUp 0.5s ease";
+      } else {
+        card.style.display = "none";
+      }
+    });
   });
 }
+
+// Debounced version for better performance
+const debouncedFilterTopics = debounce(filterTopics, 300);
 
 // ============================================
 // INITIALIZATION
@@ -90,6 +111,20 @@ function filterTopics(searchTerm) {
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   updateProgressBar();
+
+  // Register service worker for offline support
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .then((registration) => {
+          console.log("✅ Service Worker registered:", registration.scope);
+        })
+        .catch((error) => {
+          console.log("❌ Service Worker registration failed:", error);
+        });
+    });
+  }
 
   // Theme toggle listener
   const themeToggle = document.querySelector(".theme-toggle");
@@ -101,7 +136,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.querySelector(".search-input");
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
-      filterTopics(e.target.value);
+      debouncedFilterTopics(e.target.value);
     });
   }
+
+  // Prefetch topic pages on hover
+  const topicCards = document.querySelectorAll(".topic-card");
+  topicCards.forEach((card) => {
+    card.addEventListener(
+      "mouseenter",
+      function () {
+        const link = this.querySelector("a");
+        if (link && link.href) {
+          const prefetchLink = document.createElement("link");
+          prefetchLink.rel = "prefetch";
+          prefetchLink.href = link.href;
+          document.head.appendChild(prefetchLink);
+        }
+      },
+      { once: true }
+    );
+  });
 });
