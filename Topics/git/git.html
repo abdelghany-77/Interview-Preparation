@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Git Interview Questions</title>
-    <link rel="stylesheet" href="../../styles.css" />
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <div class="header-content">
-          <div class="header-text">
-            <h1>🔀 Git Interview Questions</h1>
-            <p>Master version control and Git concepts</p>
-          </div>
-          <div class="header-actions">
-            <button class="theme-toggle" title="Toggle Dark Mode">🌙</button>
-          </div>
-        </div>
-      </header>
 
-      <div class="topic-selector">
-        <a href="../../index.html"
-          ><button class="topic-btn">← Back to Home</button></a
-        >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git — Study Dashboard</title>
+  <link rel="preload" href="../../styles.css" as="style" />
+  <link rel="stylesheet" href="../../styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>" />
+</head>
+
+<body>
+  <div class="topic-page">
+    <div class="topic-header">
+      <div class="topic-header-left">
+        <a href="../../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <h1 class="topic-page-title">Git & Version Control</h1>
       </div>
-
-      <div id="content">
-        <!-- Questions will be dynamically loaded here -->
+      <div class="topic-header-right">
+        <button class="topic-study-toggle" id="studyToggle">
+          <i class="fas fa-graduation-cap"></i> Study Mode
+        </button>
+        <button class="topic-theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
       </div>
     </div>
 
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="back-to-top" title="Back to Top">↑</button>
+    <div id="content"></div>
 
-    <script src="git.js"></script>
-  </body>
+    <button class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></button>
+  </div>
+
+  <script src="../../script.js" defer></script>
+  <script src="git.js" defer></script>
+  <script src="../../topic-renderer.js" defer></script>
+</body>
+
 </html>

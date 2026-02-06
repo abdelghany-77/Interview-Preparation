@@ -4,32 +4,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laravel Interview Questions</title>
+  <title>Laravel — Study Dashboard</title>
+  <link rel="preload" href="../../styles.css" as="style" />
   <link rel="stylesheet" href="../../styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>" />
 </head>
 
 <body>
-  <div class="header-content">
-    <header>
-      <h1>🔺 Laravel Interview Questions</h1>
-    </header>
-    <button class="theme-toggle" title="Toggle theme">🌙</button>
-  </div>
-
-  <div class="container">
-    <div class="topic-selector">
-      <a href="../../index.html"><button class="topic-btn">← Back to Home</button></a>
+  <div class="topic-page">
+    <div class="topic-header">
+      <div class="topic-header-left">
+        <a href="../../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <h1 class="topic-page-title">Laravel</h1>
+      </div>
+      <div class="topic-header-right">
+        <button class="topic-study-toggle" id="studyToggle">
+          <i class="fas fa-graduation-cap"></i> Study Mode
+        </button>
+        <button class="topic-theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
     </div>
 
-    <div id="content">
-      <!-- Questions will be dynamically loaded here -->
-    </div>
+    <div id="content"></div>
+
+    <button class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></button>
   </div>
 
-  <!-- Back to Top Button -->
-  <button id="backToTop" class="back-to-top" title="Back to Top">↑</button>
-
-  <script src="laravel.js"></script>
+  <script src="../../script.js" defer></script>
+  <script src="laravel.js" defer></script>
+  <script src="../../topic-renderer.js" defer></script>
 </body>
 
 </html>

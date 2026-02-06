@@ -4,22 +4,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interview Preparation - Technical Interviews</title>
+  <title>Study Dashboard — Interview Preparation</title>
   <meta name="description"
-    content="Comprehensive technical interview preparation with questions across JavaScript, Node.js, Git, MongoDB, OOP, and more." />
+    content="Professional study dashboard for technical interview preparation. 800+ questions across React, Node.js, Laravel, System Design, and more." />
 
   <!-- Performance Optimizations -->
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
 
   <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>" />
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>" />
 
   <!-- Preload critical CSS -->
   <link rel="preload" href="styles.css" as="style" />
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Load Font Awesome with defer -->
+  <!-- Load Font Awesome -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style"
     onload="this.onload=null;this.rel='stylesheet'" />
   <noscript>
@@ -28,220 +28,522 @@
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <div class="header-content">
-        <div class="header-text">
-          <h1>Interview Preparation</h1>
-        </div>
-        <div class="header-actions">
-          <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
-            <i class="fas fa-moon"></i>
-          </button>
-        </div>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon"></span>
+        <span class="logo-text">StudyDash</span>
       </div>
-    </header>
-
-    <div class="search-section">
-      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search topics or questions..." />
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
 
-    <main id="content">
-      <div class="welcome-section">
-        <h2>👋 Welcome to Your Interview Prep Journey!</h2>
-        <p class="welcome-description">
-          Select a topic below to start practicing. Each topic contains
-          carefully crafted questions organized by difficulty level to help
-          you progress from basics to advanced concepts.
-        </p>
+    <div class="sidebar-progress">
+      <div class="progress-ring-container">
+        <svg class="progress-ring" width="80" height="80">
+          <circle class="progress-ring-bg" cx="40" cy="40" r="34" />
+          <circle class="progress-ring-fill" id="progressRing" cx="40" cy="40" r="34" />
+        </svg>
+        <span class="progress-ring-text" id="progressPercent">0%</span>
+      </div>
+      <div class="progress-info">
+        <span class="progress-label">Study Progress</span>
+        <span class="progress-detail" id="progressDetail">0 / 800+ completed</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Categories</div>
+      <button class="nav-filter active" data-category="all">
+        <i class="fas fa-th-large"></i> All Topics
+      </button>
+      <button class="nav-filter" data-category="frontend">
+        <i class="fas fa-palette"></i> Frontend
+      </button>
+      <button class="nav-filter" data-category="backend">
+        <i class="fas fa-server"></i> Backend
+      </button>
+      <button class="nav-filter" data-category="database">
+        <i class="fas fa-database"></i> Database
+      </button>
+      <button class="nav-filter" data-category="devops">
+        <i class="fas fa-cogs"></i> DevOps
+      </button>
+      <button class="nav-filter" data-category="general">
+        <i class="fas fa-lightbulb"></i> General
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+        <span>Dark Mode</span>
+      </button>
+      <button class="reset-btn" id="resetProgress" title="Reset Progress">
+        <i class="fas fa-redo-alt"></i>
+        <span>Reset</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search topics, questions..." />
+        <kbd class="search-shortcut">/</kbd>
       </div>
 
-      <div class="topics-grid" id="topicsGrid">
-        <a href="Topics/fronend/frontend.html" class="topic-card" data-topic="frontend">
+      <div class="topbar-actions">
+        <div class="difficulty-filter">
+          <button class="diff-btn active" data-level="all">All Levels</button>
+          <button class="diff-btn" data-level="junior">Junior</button>
+          <button class="diff-btn" data-level="mid">Mid-level</button>
+          <button class="diff-btn" data-level="senior">Senior</button>
+        </div>
+        <button class="study-mode-toggle" id="studyModeToggle" title="Toggle Study Mode">
+          <i class="fas fa-graduation-cap"></i>
+          <span class="study-mode-label">Study Mode</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="dashboard-stats" id="dashboardStats">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+        <div class="stat-info">
+          <span class="stat-value" id="totalQuestions">800+</span>
+          <span class="stat-label">Total Questions</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon completed"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-info">
+          <span class="stat-value" id="completedCount">0</span>
+          <span class="stat-label">Completed</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon topics"><i class="fas fa-layer-group"></i></div>
+        <div class="stat-info">
+          <span class="stat-value" id="topicCount">16</span>
+          <span class="stat-label">Topics</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon streak"><i class="fas fa-fire"></i></div>
+        <div class="stat-info">
+          <span class="stat-value" id="streakCount">0</span>
+          <span class="stat-label">Day Streak</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Topics Grid -->
+    <div class="section-header">
+      <h2 id="sectionTitle">All Topics</h2>
+      <span class="topic-count" id="visibleCount">16 topics</span>
+    </div>
+
+    <div class="topics-grid" id="topicsGrid">
+      <!-- Frontend Category -->
+      <a href="Topics/fronend/frontend.html" class="topic-card" data-topic="frontend" data-category="frontend"
+        data-level="junior" data-questions="100">
+        <div class="card-header">
           <div class="topic-icon"><i class="fas fa-palette"></i></div>
-          <h3>Frontend Development</h3>
-          <p>HTML, CSS, Bootstrap, JavaScript & TypeScript fundamentals</p>
+          <span class="level-badge junior">Junior+</span>
+        </div>
+        <h3>Frontend Development</h3>
+        <p>HTML, CSS, Bootstrap, JavaScript & TypeScript</p>
+        <div class="card-footer">
           <div class="topic-stats">
-            <span class="badge badge-easy">35 Questions</span>
-            <span class="badge badge-medium">45 Questions</span>
-            <span class="badge badge-hard">20 Questions</span>
+            <span class="badge badge-easy">35</span>
+            <span class="badge badge-medium">45</span>
+            <span class="badge badge-hard">20</span>
           </div>
-          <div class="topic-total">100+ Questions</div>
-        </a>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="frontend"></div>
+            </div>
+            <span class="progress-count" data-topic="frontend">0/100</span>
+          </div>
+        </div>
+      </a>
 
-        <a href="Topics/js/js.html" class="topic-card" data-topic="javascript">
+      <a href="Topics/js/js.html" class="topic-card" data-topic="javascript" data-category="frontend"
+        data-level="junior" data-questions="67">
+        <div class="card-header">
           <div class="topic-icon"><i class="fab fa-js-square"></i></div>
-          <h3>JavaScript</h3>
-          <p>Master JS fundamentals and advanced concepts</p>
+          <span class="level-badge junior">Junior+</span>
+        </div>
+        <h3>JavaScript</h3>
+        <p>Core JS, ES6+, closures, async patterns</p>
+        <div class="card-footer">
           <div class="topic-stats">
-            <span class="badge badge-easy">25 Easy</span>
-            <span class="badge badge-medium">29 Medium</span>
-            <span class="badge badge-hard">13 Hard</span>
+            <span class="badge badge-easy">25</span>
+            <span class="badge badge-medium">29</span>
+            <span class="badge badge-hard">13</span>
           </div>
-          <div class="topic-total">67 Questions</div>
-        </a>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="javascript"></div>
+            </div>
+            <span class="progress-count" data-topic="javascript">0/67</span>
+          </div>
+        </div>
+      </a>
 
-        <a href="Topics/git/git.html" class="topic-card" data-topic="git">
-          <div class="topic-icon"><i class="fab fa-git-alt"></i></div>
-          <h3>Git & Version Control</h3>
-          <p>Learn Git workflows and best practices</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">6 Easy</span>
-            <span class="badge badge-medium">7 Medium</span>
-            <span class="badge badge-hard">7 Hard</span>
-          </div>
-          <div class="topic-total">20 Questions</div>
-        </a>
-
-        <a href="Topics/nodejs/nodejs.html" class="topic-card" data-topic="nodejs">
-          <div class="topic-icon"><i class="fab fa-node-js"></i></div>
-          <h3>Node.js</h3>
-          <p>Master server-side JavaScript</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">18 Easy</span>
-            <span class="badge badge-medium">10 Medium</span>
-            <span class="badge badge-hard">10 Hard</span>
-          </div>
-          <div class="topic-total">38 Questions</div>
-        </a>
-
-        <a href="Topics/mongodb/mongodb.html" class="topic-card" data-topic="mongodb">
-          <div class="topic-icon"><i class="fas fa-leaf"></i></div>
-          <h3>MongoDB</h3>
-          <p>NoSQL database concepts and queries</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">24 Easy</span>
-            <span class="badge badge-medium">16 Medium</span>
-            <span class="badge badge-hard">17 Hard</span>
-          </div>
-          <div class="topic-total">57 Questions</div>
-        </a>
-
-        <a href="Topics/OOP/OOP.html" class="topic-card" data-topic="oop">
-          <div class="topic-icon"><i class="fas fa-cube"></i></div>
-          <h3>OOP & SOLID</h3>
-          <p>Object-oriented programming principles</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">22 Easy</span>
-            <span class="badge badge-medium">16 Medium</span>
-            <span class="badge badge-hard">9 Hard</span>
-          </div>
-          <div class="topic-total">47 Questions</div>
-        </a>
-
-        <a href="Topics/db/db.html" class="topic-card" data-topic="database">
-          <div class="topic-icon"><i class="fas fa-database"></i></div>
-          <h3>Database Concepts</h3>
-          <p>SQL, normalization, and database design</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">10 Easy</span>
-            <span class="badge badge-medium">12 Medium</span>
-            <span class="badge badge-hard">10 Hard</span>
-          </div>
-          <div class="topic-total">32 Questions</div>
-        </a>
-
-        <a href="Topics/general/gen.html" class="topic-card" data-topic="general">
-          <div class="topic-icon"><i class="fas fa-lightbulb"></i></div>
-          <h3>General & Mixed</h3>
-          <p>Cross-topic questions and web concepts</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">28 Easy</span>
-            <span class="badge badge-medium">21 Medium</span>
-            <span class="badge badge-hard">10 Hard</span>
-          </div>
-          <div class="topic-total">59 Questions</div>
-        </a>
-
-        <a href="Topics/mysql/mysql.html" class="topic-card" data-topic="mysql">
-          <div class="topic-icon"><i class="fas fa-server"></i></div>
-          <h3>MySQL</h3>
-          <p>Relational database and SQL mastery</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">30 Easy</span>
-            <span class="badge badge-medium">19 Medium</span>
-            <span class="badge badge-hard">6 Hard</span>
-          </div>
-          <div class="topic-total">50 Questions</div>
-        </a>
-
-        <a href="Topics/angular/angular.html" class="topic-card" data-topic="angular">
-          <div class="topic-icon"><i class="fab fa-angular"></i></div>
-          <h3>Angular</h3>
-          <p>Components, directives, and modern Angular</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">30 Easy</span>
-            <span class="badge badge-medium">19 Medium</span>
-            <span class="badge badge-hard">11 Hard</span>
-          </div>
-          <div class="topic-total">60 Questions</div>
-        </a>
-
-        <a href="Topics/docker/docker.html" class="topic-card" data-topic="docker">
-          <div class="topic-icon"><i class="fab fa-docker"></i></div>
-          <h3>Docker</h3>
-          <p>Containerization and Docker mastery</p>
-          <div class="topic-stats">
-            <span class="badge badge-easy">20 Easy</span>
-            <span class="badge badge-medium">20 Medium</span>
-            <span class="badge badge-hard">10 Hard</span>
-          </div>
-          <div class="topic-total">50 Questions</div>
-        </a>
-        <a href="Topics/react/react.html" class="topic-card" data-topic="react">
+      <a href="Topics/react/react.html" class="topic-card" data-topic="react" data-category="frontend" data-level="mid"
+        data-questions="100">
+        <div class="card-header">
           <div class="topic-icon"><i class="fab fa-react"></i></div>
-          <h3>React</h3>
-          <p>React, Router, Redux, Testing, Native</p>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>React</h3>
+        <p>Hooks, Router, Redux, Testing, Native</p>
+        <div class="card-footer">
           <div class="topic-stats">
-            <span class="badge badge-easy">50+ Core</span>
-            <span class="badge badge-medium">30+ Router/Redux</span>
-            <span class="badge badge-hard">20+ Advanced</span>
+            <span class="badge badge-easy">50+</span>
+            <span class="badge badge-medium">30+</span>
+            <span class="badge badge-hard">20+</span>
           </div>
-          <div class="topic-total">100+ Questions</div>
-        </a>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="react"></div>
+            </div>
+            <span class="progress-count" data-topic="react">0/100</span>
+          </div>
+        </div>
+      </a>
 
-        <a href="Topics/php/php.html" class="topic-card" data-topic="php">
+      <a href="Topics/angular/angular.html" class="topic-card" data-topic="angular" data-category="frontend"
+        data-level="mid" data-questions="60">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fab fa-angular"></i></div>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>Angular</h3>
+        <p>Components, directives, services, RxJS</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">30</span>
+            <span class="badge badge-medium">19</span>
+            <span class="badge badge-hard">11</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="angular"></div>
+            </div>
+            <span class="progress-count" data-topic="angular">0/60</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Backend Category -->
+      <a href="Topics/nodejs/nodejs.html" class="topic-card" data-topic="nodejs" data-category="backend"
+        data-level="mid" data-questions="38">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fab fa-node-js"></i></div>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>Node.js</h3>
+        <p>Event loop, streams, Express, REST APIs</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">18</span>
+            <span class="badge badge-medium">10</span>
+            <span class="badge badge-hard">10</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="nodejs"></div>
+            </div>
+            <span class="progress-count" data-topic="nodejs">0/38</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="Topics/php/php.html" class="topic-card" data-topic="php" data-category="backend" data-level="junior"
+        data-questions="35">
+        <div class="card-header">
           <div class="topic-icon"><i class="fab fa-php"></i></div>
-          <h3>PHP</h3>
-          <p>Core PHP, OOP, Security, and Best Practices</p>
+          <span class="level-badge junior">Junior+</span>
+        </div>
+        <h3>PHP</h3>
+        <p>Core PHP, OOP, Security, Best Practices</p>
+        <div class="card-footer">
           <div class="topic-stats">
-            <span class="badge badge-easy">15 Easy</span>
-            <span class="badge badge-medium">12 Medium</span>
-            <span class="badge badge-hard">8 Hard</span>
+            <span class="badge badge-easy">15</span>
+            <span class="badge badge-medium">12</span>
+            <span class="badge badge-hard">8</span>
           </div>
-          <div class="topic-total">35 Questions</div>
-        </a>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="php"></div>
+            </div>
+            <span class="progress-count" data-topic="php">0/35</span>
+          </div>
+        </div>
+      </a>
 
-        <a href="Topics/laravel/laravel.html" class="topic-card" data-topic="laravel">
+      <a href="Topics/laravel/laravel.html" class="topic-card" data-topic="laravel" data-category="backend"
+        data-level="mid" data-questions="37">
+        <div class="card-header">
           <div class="topic-icon"><i class="fab fa-laravel"></i></div>
-          <h3>Laravel</h3>
-          <p>MVC, Eloquent, Middleware, and Advanced Patterns</p>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>Laravel</h3>
+        <p>Eloquent, Middleware, Queues, Advanced Patterns</p>
+        <div class="card-footer">
           <div class="topic-stats">
-            <span class="badge badge-easy">15 Easy</span>
-            <span class="badge badge-medium">12 Medium</span>
-            <span class="badge badge-hard">10 Hard</span>
+            <span class="badge badge-easy">15</span>
+            <span class="badge badge-medium">12</span>
+            <span class="badge badge-hard">10</span>
           </div>
-          <div class="topic-total">37 Questions</div>
-        </a>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="laravel"></div>
+            </div>
+            <span class="progress-count" data-topic="laravel">0/37</span>
+          </div>
+        </div>
+      </a>
 
-        <a href="Topics/problemsolving/problemsolving.html" class="topic-card" data-topic="problemsolving">
-          <div class="topic-icon"><i class="fas fa-code"></i></div>
-          <h3>Problem Solving</h3>
-          <p>Famous Algorithms, Data Structures & Coding Challenges</p>
+      <!-- Database Category -->
+      <a href="Topics/mongodb/mongodb.html" class="topic-card" data-topic="mongodb" data-category="database"
+        data-level="mid" data-questions="57">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fas fa-leaf"></i></div>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>MongoDB</h3>
+        <p>NoSQL, aggregation, indexing, schema design</p>
+        <div class="card-footer">
           <div class="topic-stats">
-            <span class="badge badge-easy">10 Easy</span>
-            <span class="badge badge-medium">8 Medium</span>
-            <span class="badge badge-hard">7 Hard</span>
+            <span class="badge badge-easy">24</span>
+            <span class="badge badge-medium">16</span>
+            <span class="badge badge-hard">17</span>
           </div>
-          <div class="topic-total">25 Questions</div>
-        </a>
-      </div>
-    </main>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="mongodb"></div>
+            </div>
+            <span class="progress-count" data-topic="mongodb">0/57</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="Topics/mysql/mysql.html" class="topic-card" data-topic="mysql" data-category="database"
+        data-level="junior" data-questions="50">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fas fa-database"></i></div>
+          <span class="level-badge junior">Junior+</span>
+        </div>
+        <h3>MySQL</h3>
+        <p>SQL queries, joins, optimization, indexing</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">30</span>
+            <span class="badge badge-medium">19</span>
+            <span class="badge badge-hard">6</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="mysql"></div>
+            </div>
+            <span class="progress-count" data-topic="mysql">0/50</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="Topics/db/db.html" class="topic-card" data-topic="database" data-category="database" data-level="mid"
+        data-questions="32">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fas fa-project-diagram"></i></div>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>Database Concepts</h3>
+        <p>Normalization, ACID, transactions, design</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">10</span>
+            <span class="badge badge-medium">12</span>
+            <span class="badge badge-hard">10</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="database"></div>
+            </div>
+            <span class="progress-count" data-topic="database">0/32</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- General / CS Fundamentals -->
+      <a href="Topics/OOP/OOP.html" class="topic-card" data-topic="oop" data-category="general" data-level="junior"
+        data-questions="47">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fas fa-cubes"></i></div>
+          <span class="level-badge junior">Junior+</span>
+        </div>
+        <h3>OOP & SOLID</h3>
+        <p>Encapsulation, Inheritance, Polymorphism, SOLID</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">22</span>
+            <span class="badge badge-medium">16</span>
+            <span class="badge badge-hard">9</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="oop"></div>
+            </div>
+            <span class="progress-count" data-topic="oop">0/47</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="Topics/general/gen.html" class="topic-card" data-topic="general" data-category="general"
+        data-level="junior" data-questions="59">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fas fa-lightbulb"></i></div>
+          <span class="level-badge junior">Junior+</span>
+        </div>
+        <h3>General & Mixed</h3>
+        <p>Cross-topic questions, web fundamentals</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">28</span>
+            <span class="badge badge-medium">21</span>
+            <span class="badge badge-hard">10</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="general"></div>
+            </div>
+            <span class="progress-count" data-topic="general">0/59</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="Topics/problemsolving/problemsolving.html" class="topic-card" data-topic="problemsolving"
+        data-category="general" data-level="mid" data-questions="25">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fas fa-code"></i></div>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>Problem Solving</h3>
+        <p>Algorithms, Data Structures, Coding Challenges</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">10</span>
+            <span class="badge badge-medium">8</span>
+            <span class="badge badge-hard">7</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="problemsolving"></div>
+            </div>
+            <span class="progress-count" data-topic="problemsolving">0/25</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- DevOps -->
+      <a href="Topics/git/git.html" class="topic-card" data-topic="git" data-category="devops" data-level="junior"
+        data-questions="20">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fab fa-git-alt"></i></div>
+          <span class="level-badge junior">Junior+</span>
+        </div>
+        <h3>Git & Version Control</h3>
+        <p>Branching, merging, workflows, best practices</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">6</span>
+            <span class="badge badge-medium">7</span>
+            <span class="badge badge-hard">7</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="git"></div>
+            </div>
+            <span class="progress-count" data-topic="git">0/20</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="Topics/docker/docker.html" class="topic-card" data-topic="docker" data-category="devops" data-level="mid"
+        data-questions="50">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fab fa-docker"></i></div>
+          <span class="level-badge mid">Mid-level</span>
+        </div>
+        <h3>Docker</h3>
+        <p>Containers, images, compose, orchestration</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">20</span>
+            <span class="badge badge-medium">20</span>
+            <span class="badge badge-hard">10</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="docker"></div>
+            </div>
+            <span class="progress-count" data-topic="docker">0/50</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- NEW: System Design -->
+      <a href="Topics/systemdesign/systemdesign.html" class="topic-card" data-topic="systemdesign"
+        data-category="backend" data-level="senior" data-questions="20">
+        <div class="card-header">
+          <div class="topic-icon"><i class="fas fa-sitemap"></i></div>
+          <span class="level-badge senior">Senior</span>
+        </div>
+        <h3>System Design</h3>
+        <p>Scalability, microservices, caching, architecture</p>
+        <div class="card-footer">
+          <div class="topic-stats">
+            <span class="badge badge-easy">4</span>
+            <span class="badge badge-medium">8</span>
+            <span class="badge badge-hard">8</span>
+          </div>
+          <div class="card-progress">
+            <div class="mini-progress">
+              <div class="mini-progress-fill" data-topic="systemdesign"></div>
+            </div>
+            <span class="progress-count" data-topic="systemdesign">0/20</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state hidden" id="emptyState">
+      <i class="fas fa-search"></i>
+      <h3>No topics found</h3>
+      <p>Try adjusting your search or filters</p>
+    </div>
 
     <footer class="footer">
-      <p>Built By <strong>Abdelghany</strong></p>
+      <p>Built by <strong>Abdelghany</strong></p>
     </footer>
-  </div>
+  </main>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- Performance optimizations script -->
   <script src="performance.js" defer></script>

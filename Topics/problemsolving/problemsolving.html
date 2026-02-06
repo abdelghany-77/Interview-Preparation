@@ -4,60 +4,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Problem Solving - Interview Questions</title>
-
-  <!-- Performance Optimizations -->
-  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-
-  <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>" />
-
-  <!-- Preload critical CSS -->
+  <title>Problem Solving — Study Dashboard</title>
   <link rel="preload" href="../../styles.css" as="style" />
   <link rel="stylesheet" href="../../styles.css" />
-
-  <!-- Load Font Awesome with defer -->
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style"
-    onload="this.onload=null;this.rel='stylesheet'" />
-  <noscript>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  </noscript>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>" />
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <a href="../../index.html" class="back-btn">
-        <i class="fas fa-arrow-left"></i>
-        Back to Topics
-      </a>
-      <h1>
-        <i class="fas fa-code"></i>
-        Problem Solving Interview Questions
-      </h1>
-      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-        <i class="fas fa-moon"></i>
-      </button>
-    </header>
-
-    <div class="search-container">
-      <i class="fas fa-search search-icon"></i>
-      <input type="text" id="search-input" class="search-input" placeholder="Search questions..." />
+  <div class="topic-page">
+    <div class="topic-header">
+      <div class="topic-header-left">
+        <a href="../../index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <h1 class="topic-page-title">Problem Solving</h1>
+      </div>
+      <div class="topic-header-right">
+        <button class="topic-study-toggle" id="studyToggle">
+          <i class="fas fa-graduation-cap"></i> Study Mode
+        </button>
+        <button class="topic-theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
     </div>
 
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
+    <div id="content"></div>
 
-    <div id="questions-container"></div>
-
-    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
-      <i class="fas fa-arrow-up"></i>
-    </button>
+    <button class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></button>
   </div>
 
-  <script src="problemsolving.js"></script>
+  <script src="../../script.js" defer></script>
+  <script src="problemsolving.js" defer></script>
+  <script src="../../topic-renderer.js" defer></script>
 </body>
 
 </html>

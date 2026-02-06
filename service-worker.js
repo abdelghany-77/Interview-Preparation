@@ -1,8 +1,8 @@
 // Service Worker for Interview Preparation Website
 // Provides offline support and caching for better performance
 
-const CACHE_NAME = "interview-prep-v1";
-const RUNTIME_CACHE = "interview-prep-runtime-v1";
+const CACHE_NAME = "interview-prep-v2";
+const RUNTIME_CACHE = "interview-prep-runtime-v2";
 
 // Resources to cache immediately
 const PRECACHE_URLS = [
@@ -11,6 +11,7 @@ const PRECACHE_URLS = [
   "/styles.css",
   "/script.js",
   "/performance.js",
+  "/topic-renderer.js",
 ];
 
 // Install event - cache critical resources
@@ -22,7 +23,7 @@ self.addEventListener("install", (event) => {
         console.log("💾 Caching critical resources");
         return cache.addAll(PRECACHE_URLS);
       })
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()),
   );
 });
 
@@ -34,7 +35,7 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((cacheNames) => {
         return cacheNames.filter(
-          (cacheName) => !currentCaches.includes(cacheName)
+          (cacheName) => !currentCaches.includes(cacheName),
         );
       })
       .then((cachesToDelete) => {
@@ -42,10 +43,10 @@ self.addEventListener("activate", (event) => {
           cachesToDelete.map((cacheToDelete) => {
             console.log("🗑️ Deleting old cache:", cacheToDelete);
             return caches.delete(cacheToDelete);
-          })
+          }),
         );
       })
-      .then(() => self.clients.claim())
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -77,7 +78,7 @@ self.addEventListener("fetch", (event) => {
             // Return offline page if available
             return caches.match("/index.html");
           });
-        })
+        }),
     );
     return;
   }
@@ -129,7 +130,7 @@ self.addEventListener("fetch", (event) => {
           console.error("Fetch failed:", error);
           throw error;
         });
-    })
+    }),
   );
 });
 
@@ -146,9 +147,9 @@ self.addEventListener("message", (event) => {
           cacheNames.map((cacheName) => {
             console.log("🗑️ Clearing cache:", cacheName);
             return caches.delete(cacheName);
-          })
+          }),
         );
-      })
+      }),
     );
   }
 });
