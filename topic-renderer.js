@@ -414,6 +414,60 @@
     initTopicTheme();
     initStudyMode();
     initBackToTop();
+    initSyntaxHighlighting();
+  }
+
+  // ---- Syntax Highlighting (Prism.js) ----
+  function initSyntaxHighlighting() {
+    // Add Prism JS
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js";
+    // Add additional languages JS (e.g., jsx, php)
+    const scriptLangs = document.createElement("script");
+    scriptLangs.src = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js";
+    
+    script.onload = () => {
+      document.head.appendChild(scriptLangs);
+      scriptLangs.onload = () => {
+        // Find all code examples and prepare them for Prism
+        document.querySelectorAll('pre.code-example, pre:not([class])').forEach(pre => {
+          // Add language class if not present
+          const hasLang = Array.from(pre.classList).some(c => c.startsWith('language-'));
+          if (!hasLang) {
+            // Default to JS or HTML based on content heuristics, or just text
+            let codeContent = pre.innerText;
+            if (codeContent.includes('</') || codeContent.includes('/>')) {
+              pre.classList.add('language-markup');
+            } else if (codeContent.includes('function') || codeContent.includes('const ') || codeContent.includes('let ')) {
+              pre.classList.add('language-javascript');
+            } else {
+              pre.classList.add('language-javascript'); // Default fallback
+            }
+          }
+
+          // Prism expects <code> inside <pre>
+          if (!pre.querySelector('code')) {
+            const code = document.createElement('code');
+            code.className = pre.className;
+            
+            // Fix HTML Entities: use `textContent` to avoid escaped `&lt;` rendering as raw strings
+            // If the original was escaped HTML, setting it as textContent will unescape it for Prism.
+            code.textContent = pre.innerHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+            
+            pre.innerHTML = '';
+            pre.appendChild(code);
+            pre.classList.remove('language-javascript', 'language-markup');
+          }
+        });
+        
+        // Trigger highlight
+        if (window.Prism) {
+          window.Prism.highlightAll();
+        }
+      };
+    };
+    
+    document.head.appendChild(script);
   }
 
   // Use setTimeout to ensure this runs AFTER any other DOMContentLoaded handlers

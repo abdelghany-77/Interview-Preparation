@@ -1,8 +1,8 @@
 // Service Worker for Interview Preparation Website
 // Provides offline support and caching for better performance
 
-const CACHE_NAME = "interview-prep-v2";
-const RUNTIME_CACHE = "interview-prep-runtime-v2";
+const CACHE_NAME = "interview-prep-v5";
+const RUNTIME_CACHE = "interview-prep-runtime-v5";
 
 // Resources to cache immediately
 const PRECACHE_URLS = [

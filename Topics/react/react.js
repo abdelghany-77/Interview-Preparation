@@ -1,9 +1,4 @@
-﻿// React Interview Questions (Full Import)
-// Source: https://github.com/sudheerj/reactjs-interview-questions
-// Organized by section: Core, Router, Redux, Testing, Native, Miscellaneous
-// Each question: { section, q, a, example (optional) }
-
-const questions = {
+﻿const questions = {
   react: {
     core: [
       {
